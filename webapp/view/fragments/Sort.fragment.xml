@@ -1,0 +1,11 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m">
+    <ViewSettingsDialog confirm="onSortConfirmed" reset="" selectedSortItem="{tableSettings>/sort/selectedSortItem}">
+        <sortItems>
+            <ViewSettingsItem key="name" text="Name" />
+            <ViewSettingsItem key="nationality" text="Nationality" />
+            <ViewSettingsItem key="number" text="Number" />
+            <ViewSettingsItem key="birthday" text="Birthday" />
+            <ViewSettingsItem key="team" text="Team" />
+        </sortItems>
+    </ViewSettingsDialog>
+</core:FragmentDefinition>

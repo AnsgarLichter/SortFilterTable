@@ -1,0 +1,155 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
+    <ViewSettingsDialog confirm="onFilterConfirmed"
+        resetFilters="onResetFiltersPressed">
+        <filterItems>
+            <ViewSettingsCustomItem key="name"
+                text="Name"
+                filterCount="{tableSettings>/filter/name/filterCount}"
+                selected="{tableSettings>/filter/name/isSelected}">
+                <customControl>
+                    <f:SimpleForm>
+                        <Label text="Filter Operator" />
+                        <Select app:key="name">
+                            <core:Item key="FilterOperator.Contains"
+                                text="Contains" />
+                            <core:Item key="FilterOperator.EQ"
+                                text="Equals" />
+                        </Select>
+
+                        <Label text="Name" />
+                        <Input value="{tableSettings>/filter/name/value1}"
+                            app:key="name"
+                            change="onStringFilterValueChanged" />
+                    </f:SimpleForm>
+                </customControl>
+            </ViewSettingsCustomItem>
+            <ViewSettingsCustomItem key="nationality"
+                text="Nationality"
+                filterCount="{tableSettings>/filter/nationality/filterCount}"
+                selected="{tableSettings>/filter/nationality/isSelected}">
+                <customControl>
+                    <f:SimpleForm app:key="nationality">
+                        <Label text="Nationality" />
+                        <MultiComboBox items="{
+                                path: 'nationalities>/nationalities',
+                                sorter: { path: 'name' }
+                            }"
+                            showSelectAll="true"
+                            selectionFinish="onFilterSelectionFinished"
+                            selectedKeys="{tableSettings>/filter/nationality/selectedKeys}"
+                            app:key="nationality">
+                            <core:Item key="{nationalities>name}"
+                                text="{nationalities>name}" />
+                        </MultiComboBox>
+                    </f:SimpleForm >
+                </customControl>
+            </ViewSettingsCustomItem>
+            <ViewSettingsCustomItem key="number"
+                text="Number"
+                filterCount="{tableSettings>/filter/number/filterCount}"
+                selected="{tableSettings>/filter/number/isSelected}">
+                <customControl>
+                    <f:SimpleForm>
+                        <Label text="Filter Operator" />
+                        <Select change="onDateFilterSelectionChanged"
+                            selectedKey="{tableSettings>/filter/number/filterOperator}"
+                            app:key="number">
+                            <core:Item key="BT"
+                                text="Between" />
+                            <core:Item key="EQ"
+                                text="Equals" />
+                            <core:Item key="GT"
+                                text="Greater Than" />
+                            <core:Item key="GE"
+                                text="Greater or Equals" />
+                            <core:Item key="LE"
+                                text="Less or Equals" />
+                            <core:Item key="LT"
+                                text="Less Than" />
+                            <core:Item key="NE"
+                                text="Not Equals" />
+                        </Select>
+
+                        <Label text="Value 1" />
+                        <Input value="{tableSettings>/filter/number/value1}"
+                            app:key="name"
+                            change="onNumberFilterValueChanged"
+                            type="Number" />
+
+                        <Label text="Value 2"
+                            visible="{tableSettings>/filter/number/isValue2InputVisible}" />
+                        <Input value="{tableSettings>/filter/number/value2}"
+                            visible="{tableSettings>/filter/number/isValue2InputVisible}"
+                            app:key="name"
+                            change="onNumberFilterValueChanged"
+                            type="Number" />
+                    </f:SimpleForm>
+                </customControl>
+            </ViewSettingsCustomItem>
+            <ViewSettingsCustomItem key="birthday"
+                text="Birthday"
+                filterCount="{tableSettings>/filter/birthday/filterCount}"
+                selected="{tableSettings>/filter/birthday/isSelected}">
+                <customControl>
+                    <f:SimpleForm>
+                        <Label text="Filter Operator" />
+                        <Select change="onDateFilterSelectionChanged"
+                            selectedKey="{tableSettings>/filter/birthday/filterOperator}"
+                            app:key="birthday">
+                            <core:Item key="BT"
+                                text="Between" />
+                            <core:Item key="EQ"
+                                text="Equals" />
+                            <core:Item key="GT"
+                                text="Greater Than" />
+                            <core:Item key="GE"
+                                text="Greater or Equals" />
+                            <core:Item key="LE"
+                                text="Less or Equals" />
+                            <core:Item key="LT"
+                                text="Less Than" />
+                            <core:Item key="NE"
+                                text="Not Equals" />
+                        </Select>
+
+                        <Label text="Begin Date" />
+                        <DatePicker value="{tableSettings>/filter/birthday/value1}"
+                            app:key="birthday"
+                            change="onDateFilterValueChanged" />
+
+                        <Label text="End Date"
+                            visible="{tableSettings>/filter/birthday/isEndDateInputVisible}" />
+                        <DatePicker visible="{tableSettings>/filter/birthday/isValue2InputVisible}"
+                            value="{tableSettings>/filter/birthday/value2}"
+                            change="onDateFilterValueChanged"
+                            app:key="birthday" />
+                    </f:SimpleForm>
+                </customControl>
+            </ViewSettingsCustomItem>
+            <ViewSettingsCustomItem key="team"
+                text="Team"
+                filterCount="{tableSettings>/filter/team/filterCount}"
+                selected="{tableSettings>/filter/team/isSelected}">
+                <customControl>
+                    <f:SimpleForm app:key="team">
+                        <Label text="Team" />
+                        <MultiComboBox items="{
+                                path: 'teams>/teams',
+                                sorter: { path: 'name' }
+                            }"
+                            showSelectAll="true"
+                            selectionFinish="onFilterSelectionFinished"
+                            selectedKeys="{tableSettings>/filter/team/selectedKeys}"
+                            app:key="team">
+                            <core:Item key="{teams>name}"
+                                text="{teams>name}" />
+                        </MultiComboBox>
+                    </f:SimpleForm >
+                </customControl>
+            </ViewSettingsCustomItem>
+        </filterItems>
+    </ViewSettingsDialog>
+</core:FragmentDefinition>
