@@ -300,7 +300,7 @@ export default class Overview extends Controller {
         const sortItem = event.getParameter("sortItem") as Item;
 
         let comparatorFunction;
-        switch (filterKey) {
+        switch (sortItem.getKey()) {
             case "number": {
                 comparatorFunction = Comparator.compareNumbers;
                 break;
@@ -324,7 +324,7 @@ export default class Overview extends Controller {
             sortItem.getKey(),
             sortDescending,
             false,
-            comparatorFunction //TODO: Add comparator in dependence of column data type
+            comparatorFunction
         ));
     }
 
@@ -432,9 +432,9 @@ export default class Overview extends Controller {
         const dateFilterValue1 = tableSettingsModel.getProperty(`/filter/${filterKey}/beginDate`) as string;
         const dateFilterValue2 = tableSettingsModel.getProperty(`/filter/${filterKey}/endDate`) as string;
 
-        let isSelected = dateFilterValue1 !== null && dateFilterValue1 !== "";
+        let isSelected = !!dateFilterValue1;
         if (filterOperator === FilterOperator.BT) {
-            isSelected = isSelected && dateFilterValue2 !== null && dateFilterValue2 !== "";
+            isSelected = isSelected && !!dateFilterValue2;
         }
 
         tableSettingsModel.setProperty(`/filter/${filterKey}/isSelected`, isSelected);
