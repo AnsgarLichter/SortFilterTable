@@ -9,7 +9,7 @@ export default class Comparator {
         return a - b;
     }
 
-    public static compareDate = (a: string, b: string) => {
+    public static compareDateStrings = (a: string, b: string): number => {
         const type = new DateType({
             source: {
                 pattern: "dd.MM.yyyy" //TODO: How to set source format externally

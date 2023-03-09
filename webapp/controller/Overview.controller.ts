@@ -254,7 +254,7 @@ export default class Overview extends Controller {
                         operator: filterOperator,
                         value1: value1,
                         value2: value2,
-                        comparator: Comparator.compareDate
+                        comparator: Comparator.compareDateStrings
                     }));
                     break;
                 }
@@ -299,11 +299,32 @@ export default class Overview extends Controller {
         const sortDescending = event.getParameter("sortDescending") as boolean;
         const sortItem = event.getParameter("sortItem") as Item;
 
+        let comparatorFunction;
+        switch (filterKey) {
+            case "number": {
+                comparatorFunction = Comparator.compareNumbers;
+                break;
+            }
+            case "birthday": {
+                comparatorFunction = Comparator.compareDateStrings;
+                break;
+            }
+            case "nationality":
+            case "team": {
+                comparatorFunction = Comparator.compareStrings;
+                break;
+            }
+            default: {
+                comparatorFunction = Comparator.compareStrings;
+                break;
+            }
+        }
+
         itemsBinding.sort(new Sorter(
             sortItem.getKey(),
             sortDescending,
             false,
-            Comparator.compareStrings //TODO: Add comparator in dependence of column data type
+            comparatorFunction //TODO: Add comparator in dependence of column data type
         ));
     }
 
