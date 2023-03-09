@@ -12,10 +12,11 @@
                 <customControl>
                     <f:SimpleForm>
                         <Label text="Filter Operator" />
-                        <Select app:key="name">
-                            <core:Item key="FilterOperator.Contains"
+                        <Select app:key="name"
+                            selectedKey="{tableSettings>/filter/name/filterOperator}">
+                            <core:Item key="Contains"
                                 text="Contains" />
-                            <core:Item key="FilterOperator.EQ"
+                            <core:Item key="EQ"
                                 text="Equals" />
                         </Select>
 
@@ -116,9 +117,18 @@
                         </Select>
 
                         <Label text="Begin Date" />
-                        <DatePicker value="{tableSettings>/filter/birthday/value1}"
-                            app:key="birthday"
-                            change="onDateFilterValueChanged" />
+                        <DatePicker app:key="birthday"
+                            change="onDateFilterValueChanged"
+                            value="{
+                                path: 'tableSettings>/filter/birthday/value1',
+                                type: 'sap.ui.model.type.Date',
+                                formatOptions: {
+                                    pattern: 'dd.MM.yyyy',
+                                    source: {
+                                        pattern: 'dd.MM.yyyy' 
+                                    }
+                                }
+                            }" />
 
                         <Label text="End Date"
                             visible="{tableSettings>/filter/birthday/isEndDateInputVisible}" />

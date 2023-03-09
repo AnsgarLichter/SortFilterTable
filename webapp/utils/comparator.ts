@@ -1,3 +1,5 @@
+import DateType from "sap/ui/model/type/Date";
+
 export default class Comparator {
     public static compareStrings = (a: string, b: string): number => {
         return a.localeCompare(b);
@@ -7,7 +9,18 @@ export default class Comparator {
         return a - b;
     }
 
-    public static compareDate = (a: Date, b: Date) => {
-        return a.getTime() - b.getTime();
+    public static compareDate = (a: string, b: string) => {
+        const type = new DateType({
+            source: {
+                pattern: "dd.MM.yyyy" //TODO: How to set source format externally
+            },
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            pattern: "yyyy-MM-dd"
+        });
+        const aDate = new Date(type.formatValue(a, typeof a) as string);
+        const bDate = new Date(type.formatValue(b, typeof b) as string);
+
+        return aDate.getTime() - bDate.getTime();
     }
 }

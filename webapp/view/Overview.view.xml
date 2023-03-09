@@ -50,7 +50,16 @@
                             <Text text="{data>name}" />
                             <Text text="{data>nationality}" />
                             <Text text="{data>number}" />
-                            <Text text="{data>birthday}" />
+                            <Text text="{
+                                path: 'data>birthday',
+                                type: 'sap.ui.model.type.Date',
+                                formatOptions: {
+                                    pattern: 'dd.MM.yyyy',
+                                    source: {
+                                        pattern: 'dd.MM.yyyy' 
+                                    }
+                                }
+                            }" />
                             <Text text="{data>team}" />
                         </cells>
                     </ColumnListItem>

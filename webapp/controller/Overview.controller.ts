@@ -11,7 +11,6 @@ import Filter from "sap/ui/model/Filter";
 import Table from "sap/m/Table";
 import Sorter from "sap/ui/model/Sorter";
 import Comparator from "../utils/comparator";
-import ViewSettingsCustomItem from "sap/m/ViewSettingsCustomItem";
 import Item from "sap/ui/core/Item";
 import Event from "sap/ui/base/Event";
 
@@ -98,6 +97,7 @@ export default class Overview extends Controller {
                 nationality: {
                     filterCount: 0,
                     isSelected: false,
+                    filterOperator: FilterOperator.EQ,
                     selectedKeys: ""
                 },
                 number: {
@@ -119,6 +119,7 @@ export default class Overview extends Controller {
                 team: {
                     filterCount: 0,
                     isSelected: false,
+                    filterOperator: FilterOperator.EQ,
                     selectedKeys: ""
                 }
             }
@@ -184,7 +185,7 @@ export default class Overview extends Controller {
     }
 
     public onOpenFilterDialogPressed(): void {
-        if (!this.sortDialog) {
+        if (!this.filterDialog) {
             this.openDialog("com.lichter.mobilesortfilter.view.fragments.Filter", this, this.getView())
                 .then(dialog => {
                     this.filterDialog = dialog as ViewSettingsDialog;
@@ -216,34 +217,75 @@ export default class Overview extends Controller {
 
     public onFilterConfirmed(event: Event) {
         const tableSettingsModel = this.getTableSettingsModel();
-        const selectedKeys: string[] = tableSettingsModel.getProperty("/filter/department/selectedKeys") as string[];
         const table = this.getTable();
-        const itemsBinding: ListBinding = table?.getBinding("item") as ListBinding;
+        const itemsBinding: ListBinding = table?.getBinding("items") as ListBinding;
 
         const filterItems: ViewSettingsItem[] = event.getParameter("filterItems") as ViewSettingsItem[];
         const filters: Filter[] = [];
 
-        //TODO: Apply filter for every type with corresponding comparator
         filterItems.forEach((filterItem) => {
             const filterKey = filterItem.getKey();
+            const filterOperator = tableSettingsModel.getProperty(`/filter/${filterKey}/filterOperator`) as FilterOperator;
+            const value1 = tableSettingsModel.getProperty(`/filter/${filterKey}/value1`) as string;
+            const value2 = tableSettingsModel.getProperty(`/filter/${filterKey}/value2`) as string;
 
             switch (filterKey) {
-                case "number":
+                case "number": {
+                    if (filterOperator === FilterOperator.BT) {
+                        filters.push(new Filter({
+                            path: filterKey,
+                            operator: filterOperator,
+                            value1: value1,
+                            value2: value2
+                        }));
+                    } else {
+                        filters.push(new Filter({
+                            path: filterKey,
+                            operator: filterOperator,
+                            value1: value1,
+                            comparator: Comparator.compareNumbers
+                        }));
+                    }
                     break;
-
-                case "birthday":
-                    break;
-
-                case "nationality":
-                case "team":
-                    break;
-                default:
+                }
+                case "birthday": {
                     filters.push(new Filter({
                         path: filterKey,
-                        operator: tableSettingsModel.getProperty(`/filter/${filterKey}/filterOperator`) as FilterOperator,
-                        value1: tableSettingsModel.getProperty(`/filter/${filterKey}/value1`) as string
+                        operator: filterOperator,
+                        value1: value1,
+                        value2: value2,
+                        comparator: Comparator.compareDate
                     }));
                     break;
+                }
+                case "nationality":
+                case "team": {
+                    const selectedKeys = tableSettingsModel.getProperty(`/filter/${filterKey}/selectedKeys`) as string[];
+                    const OrFilters: Filter[] = [];
+                    selectedKeys.forEach(selectedKey => {
+                        OrFilters.push(new Filter({
+                            path: filterKey,
+                            operator: filterOperator,
+                            value1: selectedKey,
+                            comparator: Comparator.compareStrings
+                        }));
+                    });
+
+                    filters.push(new Filter({
+                        filters: OrFilters,
+                        and: false
+                    }));
+                    break;
+                }
+                default: {
+                    filters.push(new Filter({
+                        path: filterKey,
+                        operator: filterOperator,
+                        value1: value1,
+                        comparator: Comparator.compareStrings
+                    }));
+                    break;
+                }
             }
         });
 
