@@ -222,7 +222,7 @@ export default class Overview extends Controller {
 
         const filterItems: ViewSettingsItem[] = event.getParameter("filterItems") as ViewSettingsItem[];
         const filters: Filter[] = [];
-
+        
         filterItems.forEach((filterItem) => {
             const filterKey = filterItem.getKey();
             const filterOperator = tableSettingsModel.getProperty(`/filter/${filterKey}/filterOperator`) as FilterOperator;
@@ -408,6 +408,20 @@ export default class Overview extends Controller {
         tableSettingsModel.setProperty(`/filter/${filterKey}/filterCount`, isSelected ? 1 : 0);
     }
 
+    public onNumberFilterSelectionChanged(event: Event) {
+        const source = event.getSource() as Control;
+        const filterKey = source.data("key") as string;
+        const tableSettingsModel = this.getTableSettingsModel();
+        const selectedFilterOperator = tableSettingsModel.getProperty(`/filter/${filterKey}/filterOperator`) as FilterOperator;
+
+        tableSettingsModel.setProperty(
+            `/filter/${filterKey}/isValue2InputVisible`,
+            selectedFilterOperator === FilterOperator.BT
+        );
+
+        this.updateDateFilterSelectionStatus(filterKey);
+    }
+
     public onNumberFilterValueChanged(event: Event) {
         const source = event.getSource() as Control;
         const filterKey = source.data("key") as string;
@@ -429,8 +443,8 @@ export default class Overview extends Controller {
     private updateDateFilterSelectionStatus(filterKey: string) {
         const tableSettingsModel = this.getTableSettingsModel();
         const filterOperator = tableSettingsModel.getProperty(`/filter/${filterKey}/filterOperator`) as string;
-        const dateFilterValue1 = tableSettingsModel.getProperty(`/filter/${filterKey}/beginDate`) as string;
-        const dateFilterValue2 = tableSettingsModel.getProperty(`/filter/${filterKey}/endDate`) as string;
+        const dateFilterValue1 = tableSettingsModel.getProperty(`/filter/${filterKey}/value1`) as string;
+        const dateFilterValue2 = tableSettingsModel.getProperty(`/filter/${filterKey}/value2`) as string;
 
         let isSelected = !!dateFilterValue1;
         if (filterOperator === FilterOperator.BT) {

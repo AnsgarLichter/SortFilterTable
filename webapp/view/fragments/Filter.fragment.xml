@@ -55,7 +55,7 @@
                 <customControl>
                     <f:SimpleForm>
                         <Label text="Filter Operator" />
-                        <Select change="onDateFilterSelectionChanged"
+                        <Select change="onNumberFilterSelectionChanged"
                             selectedKey="{tableSettings>/filter/number/filterOperator}"
                             app:key="number">
                             <core:Item key="BT"
@@ -76,7 +76,7 @@
 
                         <Label text="Value 1" />
                         <Input value="{tableSettings>/filter/number/value1}"
-                            app:key="name"
+                            app:key="number"
                             change="onNumberFilterValueChanged"
                             type="Number" />
 
@@ -84,7 +84,7 @@
                             visible="{tableSettings>/filter/number/isValue2InputVisible}" />
                         <Input value="{tableSettings>/filter/number/value2}"
                             visible="{tableSettings>/filter/number/isValue2InputVisible}"
-                            app:key="name"
+                            app:key="number"
                             change="onNumberFilterValueChanged"
                             type="Number" />
                     </f:SimpleForm>
