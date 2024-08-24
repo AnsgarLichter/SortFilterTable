@@ -1,6 +1,6 @@
 import JSONModel from "sap/ui/model/json/JSONModel";
 import Controller from "sap/ui/core/mvc/Controller";
-import ViewSettingsDialog from "sap/m/ViewSettingsDialog";
+import ViewSettingsDialog, { ViewSettingsDialog$ConfirmEvent } from "sap/m/ViewSettingsDialog";
 import FilterOperator from "sap/ui/model/FilterOperator";
 import Fragment from "sap/ui/core/Fragment";
 import View from "sap/ui/core/mvc/View";
@@ -12,7 +12,10 @@ import Table from "sap/m/Table";
 import Sorter from "sap/ui/model/Sorter";
 import Comparator from "../utils/comparator";
 import Item from "sap/ui/core/Item";
-import Event from "sap/ui/base/Event";
+import { MultiComboBox$SelectionFinishEvent } from "sap/m/MultiComboBox";
+import { Select$ChangeEvent } from "sap/m/Select";
+import { DatePicker$ChangeEvent } from "sap/m/DatePicker";
+import { Input$ChangeEvent } from "sap/ui/webc/main/Input";
 
 /**
  * @namespace com.lichter.mobilesortfilter.controller
@@ -21,6 +24,8 @@ export default class Overview extends Controller {
 
     private sortDialog: ViewSettingsDialog
     private filterDialog: ViewSettingsDialog
+
+    //TODO: Export to own Control
 
     public onInit(): void {
         const dataModel = new JSONModel({
@@ -215,12 +220,11 @@ export default class Overview extends Controller {
             });
     }
 
-    public onFilterConfirmed(event: Event) {
+    public onFilterConfirmed(event: ViewSettingsDialog$ConfirmEvent) {
         const tableSettingsModel = this.getTableSettingsModel();
         const table = this.getTable();
         const itemsBinding: ListBinding = table?.getBinding("items") as ListBinding;
-
-        const filterItems: ViewSettingsItem[] = event.getParameter("filterItems") as ViewSettingsItem[];
+        const filterItems: ViewSettingsItem[] = event.getParameter("filterItems") || [];
         const filters: Filter[] = [];
         
         filterItems.forEach((filterItem) => {
@@ -228,7 +232,7 @@ export default class Overview extends Controller {
             const filterOperator = tableSettingsModel.getProperty(`/filter/${filterKey}/filterOperator`) as FilterOperator;
             const value1 = tableSettingsModel.getProperty(`/filter/${filterKey}/value1`) as string;
             const value2 = tableSettingsModel.getProperty(`/filter/${filterKey}/value2`) as string;
-
+    
             switch (filterKey) {
                 case "number": {
                     if (filterOperator === FilterOperator.BT) {
@@ -270,7 +274,7 @@ export default class Overview extends Controller {
                             comparator: Comparator.compareStrings
                         }));
                     });
-
+    
                     filters.push(new Filter({
                         filters: OrFilters,
                         and: false
@@ -288,11 +292,11 @@ export default class Overview extends Controller {
                 }
             }
         });
-
+    
         itemsBinding.filter(filters);
     }
 
-    public onSortConfirmed(event: Event): void {
+    public onSortConfirmed(event: ViewSettingsDialog$ConfirmEvent): void {
         const table = this.getTable();
         const itemsBinding: ListBinding = table.getBinding("items") as ListBinding;
 
@@ -366,7 +370,7 @@ export default class Overview extends Controller {
         itemsBinding.sort([]);
     }
 
-    public onFilterSelectionFinished(event: Event) {
+    public onFilterSelectionFinished(event: MultiComboBox$SelectionFinishEvent) {
         const source = event.getSource() as Control;
         const filterKey = source.data("key") as string;
         const selectedItems: Item[] = event.getParameters().selectedItems as Item[];
@@ -376,7 +380,7 @@ export default class Overview extends Controller {
         tableSettingsModel.setProperty(`/filter/${filterKey}/filterCount`, selectedItems.length);
     }
 
-    public onDateFilterSelectionChanged(event: Event) {
+    public onDateFilterSelectionChanged(event: Select$ChangeEvent) {
         const source = event.getSource() as Control;
         const filterKey = source.data("key") as string;
         const tableSettingsModel = this.getTableSettingsModel();
@@ -390,13 +394,13 @@ export default class Overview extends Controller {
         this.updateDateFilterSelectionStatus(filterKey);
     }
 
-    public onDateFilterValueChanged(event: Event) {
+    public onDateFilterValueChanged(event: DatePicker$ChangeEvent) {
         const source = event.getSource() as Control;
 
         this.updateDateFilterSelectionStatus(source.data("key") as string);
     }
 
-    public onStringFilterValueChanged(event: Event) {
+    public onStringFilterValueChanged(event: Input$ChangeEvent) {
         const source = event.getSource() as Control;
         const filterKey = source.data("key") as string;
 
@@ -408,7 +412,7 @@ export default class Overview extends Controller {
         tableSettingsModel.setProperty(`/filter/${filterKey}/filterCount`, isSelected ? 1 : 0);
     }
 
-    public onNumberFilterSelectionChanged(event: Event) {
+    public onNumberFilterSelectionChanged(event: Select$ChangeEvent) {
         const source = event.getSource() as Control;
         const filterKey = source.data("key") as string;
         const tableSettingsModel = this.getTableSettingsModel();
@@ -422,7 +426,7 @@ export default class Overview extends Controller {
         this.updateDateFilterSelectionStatus(filterKey);
     }
 
-    public onNumberFilterValueChanged(event: Event) {
+    public onNumberFilterValueChanged(event: Input$ChangeEvent) {
         const source = event.getSource() as Control;
         const filterKey = source.data("key") as string;
 

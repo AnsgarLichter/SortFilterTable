@@ -1,10 +1,16 @@
-<mvc:View controllerName="com.lichter.mobilesortfilter.controller.Overview"
+<mvc:View 
+    controllerName="com.lichter.mobilesortfilter.controller.Overview"
+    xmlns="sap.m"
+    xmlns:cc="com.lichter.mobilesortfilter.control"
     xmlns:mvc="sap.ui.core.mvc"
-    displayBlock="true"
-    xmlns="sap.m">
+    displayBlock="true">
+
     <Page id="page"
         title="{i18n>title}">
         <content>
+
+            <cc:SortFilterTable text="Hello World from the custom control!" />
+
             <Table items="{
                 path: 'data>/drivers',
                 sorter: {
