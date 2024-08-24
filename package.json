@@ -9,22 +9,23 @@
     "sapui5"
   ],
   "main": "webapp/index.html",
-  "dependencies": {},
   "devDependencies": {
-    "@ui5/cli": "^2.14.1",
+    "@babel/eslint-parser": "7.25.1",
     "@sap/ux-ui5-tooling": "1",
-    "eslint": "7.32.0",
-    "eslint-plugin-fiori-custom": "2.2.1",
-    "@babel/eslint-parser": "7.14.7",
-    "@sapui5/ts-types-esm": "~1.108.0",
-    "ui5-tooling-transpile": "^0.2.1",
-    "typescript": "^4.6.3",
-    "@typescript-eslint/eslint-plugin": "^5.17.0",
-    "@typescript-eslint/parser": "^5.17.0"
+    "@sapui5/ts-types-esm": "~1.127.1",
+    "@typescript-eslint/eslint-plugin": "^8.2.0",
+    "@typescript-eslint/parser": "^8.2.0",
+    "@ui5/cli": "^4.0.5",
+    "@ui5/ts-interface-generator": "^0.8.3",
+    "eslint": "9.9.1",
+    "eslint-plugin-fiori-custom": "2.6.7",
+    "typescript": "^5.5.4",
+    "ui5-tooling-transpile": "^3.4.8"
   },
   "scripts": {
     "start": "fiori run --open \"test/flpSandbox.html?sap-ui-xx-viewCache=false#comlichtermobilesortfilter-display\"",
     "start-local": "fiori run --config ./ui5-local.yaml --open \"test/flpSandbox.html?sap-ui-xx-viewCache=false#comlichtermobilesortfilter-display\"",
+    "watch:controls": "npx @ui5/ts-interface-generator --watch",
     "build": "ui5 build --config=ui5.yaml --clean-dest --dest dist",
     "lint": "eslint ./ --rulesdir ./node_modules/eslint-plugin-fiori-custom/lib/rules/",
     "ts-typecheck": "tsc --noEmit",
