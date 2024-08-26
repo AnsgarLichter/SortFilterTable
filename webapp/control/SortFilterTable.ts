@@ -1,14 +1,19 @@
 import Table from "sap/m/Table";
 import type { MetadataOptions } from "sap/ui/core/Element";
 import OverflowToolbar from "sap/m/OverflowToolbar";
-import Toolbar from "sap/m/Toolbar";
 import ToolbarSpacer from "sap/m/ToolbarSpacer";
 import Title from "sap/m/Title";
 import Button from "sap/m/Button";
-import ViewSettingsDialog from "sap/m/ViewSettingsDialog";
-import View from "sap/ui/vk/View";
+import ViewSettingsDialog, { ViewSettingsDialog$ConfirmEvent } from "sap/m/ViewSettingsDialog";
 import ViewSettingsItem from "sap/m/ViewSettingsItem";
 import Text from "sap/m/Text";
+import Comparator from "../utils/comparator";
+import { SortFilterColumnDataType } from "./SortFilterColumnDataType";
+import Sorter from "sap/ui/model/Sorter";
+import ListBinding from "sap/ui/model/ListBinding";
+import SortFilterColumn from "./SortFilterColumn";
+import Log from "sap/base/Log";
+import Element from "sap/ui/core/Element";
 
 /**
  * @namespace com.lichter.mobilesortfilter.control.SortFilterTable
@@ -23,7 +28,7 @@ export default class SortFilterTable extends Table {
 		properties: {
 			"title": { type: "string", defaultValue: "" },
 			"createSortDialog": { type: "boolean", defaultValue: true },
-			"createFilterDialog": { type: "boolean", defaultValue: true },
+			"createFilterDialog": { type: "boolean", defaultValue: true }
 		},
 		aggregations: {
 			"_sortDialog": { type: "sap.m.ViewSettingsDialog", multiple: false },
@@ -46,9 +51,9 @@ export default class SortFilterTable extends Table {
 	}
 
 	private initializeToolbar(): void {
-		const headerToolbar = this.getAggregation("headerToolbar") as Toolbar;
+		const headerToolbar = this.getHeaderToolbar();
 		if (!headerToolbar) {
-			this.setAggregation("headerToolbar", this.createToolbar());
+			this.setHeaderToolbar(this.createToolbar());
 			return;
 		}
 
@@ -96,7 +101,7 @@ export default class SortFilterTable extends Table {
 	}
 
 	private onOpenFilterDialogPressed(): void {
-		throw new Error("Method not implemented");
+		this.get_filterDialog().open();
 	}
 
 	private initializeSortDialog() {
@@ -104,24 +109,56 @@ export default class SortFilterTable extends Table {
 			return;
 		}
 
-		const sortItems = this.getColumns().map((column) => {
+		const columns = this.getColumns();
+		if(!Array.isArray(columns) || !columns.every(column => column instanceof SortFilterColumn)) {
+			Log.error("Columns must be of type SortFilterColumn for filter to be applied");
+			return;
+		}
+
+		const sortItems = columns.map((column) => {
 			const header = column.getHeader() as Text;
 			return new ViewSettingsItem({
-				key: header.getText(),
+				key: column.getId(),
 				text: header.getText()
 			});
 		});
 
 		//TODO: Validate whether reset is working
 		const sortDialog = new ViewSettingsDialog({
-			confirm: this.onSortDialogConfirmed,
+			confirm: this.onSortConfirmed.bind(this),
 			sortItems: sortItems
 		});
-		this.setAggregation("_sortDialog", sortDialog);
+		this.set_sortDialog(sortDialog);
 	}
 
-	private onSortDialogConfirmed(): void {
-		throw new Error("Method not implemented");
+	private onSortConfirmed(event: ViewSettingsDialog$ConfirmEvent): void {
+		const itemsBinding = this.getBinding("items") as ListBinding;
+		const sortDescending = event.getParameter("sortDescending");
+		const sortItem = event.getParameter("sortItem");
+		if(!itemsBinding || !sortItem) {
+			return;
+		}
+
+		const column = Element.getElementById(sortItem.getKey()) as SortFilterColumn;
+		let comparatorFunction;
+		switch (column.getDataType()) {
+			case SortFilterColumnDataType.Number:
+				comparatorFunction = Comparator.compareNumbers;
+				break;
+			case SortFilterColumnDataType.Date:
+				comparatorFunction = Comparator.compareDateStrings;
+				break;
+			default:
+				comparatorFunction = Comparator.compareStrings;
+				break;
+		}
+
+		itemsBinding.sort(new Sorter(
+            column.getSortProperty(),
+            sortDescending,
+            false,
+            comparatorFunction
+        ));
 	}
 
 	private initializeFilterDialog() {

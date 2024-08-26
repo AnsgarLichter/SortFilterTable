@@ -32,21 +32,31 @@
                     </OverflowToolbar>
                 </cc:headerToolbar> -->
                 <cc:columns>
-                    <Column>
+                    <cc:SortFilterColumn 
+                        sortProperty="name" 
+                        dataType="String">
                         <Text text="Driver Name" />
-                    </Column>
-                    <Column>
+                    </cc:SortFilterColumn>
+                    <cc:SortFilterColumn 
+                        sortProperty="nationality"
+                        dataType="String">
                         <Text text="Nationality" />
-                    </Column>
-                    <Column>
+                    </cc:SortFilterColumn>
+                    <cc:SortFilterColumn 
+                        sortProperty="number"
+                        dataType="Number">
                         <Text text="Number" />
-                    </Column>
-                    <Column>
+                    </cc:SortFilterColumn>
+                    <cc:SortFilterColumn 
+                        sortProperty="birthday"
+                        dataType="Date">
                         <Text text="Birthday" />
-                    </Column>
-                    <Column>
+                    </cc:SortFilterColumn>
+                    <cc:SortFilterColumn 
+                        sortProperty="team"
+                        dataType="String">
                         <Text text="Team" />
-                    </Column>
+                    </cc:SortFilterColumn>
                 </cc:columns>
                 <cc:items>
                     <ColumnListItem vAlign="Middle"
