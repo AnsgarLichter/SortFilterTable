@@ -2,7 +2,7 @@ import Column from "sap/m/Column";
 import { MetadataOptions } from "sap/ui/core/Element";
 
 /**
- * @namespace com.lichter.mobilesortfilter.control.SortFilterColumn
+ * @namespace com.lichter.mobilesortfilter.control
  */
 export default class SortFilterColumn extends Column {
 

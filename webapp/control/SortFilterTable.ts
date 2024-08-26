@@ -12,12 +12,14 @@ import { SortFilterColumnDataType } from "./SortFilterColumnDataType";
 import Sorter from "sap/ui/model/Sorter";
 import ListBinding from "sap/ui/model/ListBinding";
 import SortFilterColumn from "./SortFilterColumn";
-import Log from "sap/base/Log";
 import Element from "sap/ui/core/Element";
+import Column from "sap/m/Column";
 
 /**
- * @namespace com.lichter.mobilesortfilter.control.SortFilterTable
+ * @namespace com.lichter.mobilesortfilter.control
  */
+
+//ts-ignore
 export default class SortFilterTable extends Table {
 
 	constructor(idOrSettings?: string | $SortFilterTableSettings);
@@ -31,6 +33,7 @@ export default class SortFilterTable extends Table {
 			"createFilterDialog": { type: "boolean", defaultValue: true }
 		},
 		aggregations: {
+			"columns": { type: "com.lichter.mobilesortfilter.control.SortFilterColumn", multiple: true },
 			"_sortDialog": { type: "sap.m.ViewSettingsDialog", multiple: false },
 			"_filterDialog": { type: "sap.m.ViewSettingsDialog", multiple: false },
 		},
@@ -110,12 +113,8 @@ export default class SortFilterTable extends Table {
 		}
 
 		const columns = this.getColumns();
-		if(!Array.isArray(columns) || !columns.every(column => column instanceof SortFilterColumn)) {
-			Log.error("Columns must be of type SortFilterColumn for filter to be applied");
-			return;
-		}
-
 		const sortItems = columns.map((column) => {
+			// TODO: What TODO if it is not a text header?
 			const header = column.getHeader() as Text;
 			return new ViewSettingsItem({
 				key: column.getId(),
@@ -123,7 +122,6 @@ export default class SortFilterTable extends Table {
 			});
 		});
 
-		//TODO: Validate whether reset is working
 		const sortDialog = new ViewSettingsDialog({
 			confirm: this.onSortConfirmed.bind(this),
 			sortItems: sortItems
@@ -165,6 +163,14 @@ export default class SortFilterTable extends Table {
 		if (!this.getCreateFilterDialog()) {
 			return;
 		}
+
+		//TODO: Implement creation of filter dialog
 	}
 
+	/** Must be overriden because the interface generator defines another type which 
+	 * leads to TypeScript errors - see: https://github.com/SAP/ui5-typescript/issues/470
+	 */
+	removeColumn(vColumn: int | string | SortFilterColumn): SortFilterColumn | null {
+		return super.removeColumn(vColumn as Column) as SortFilterColumn;
+	}
 }
