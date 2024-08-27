@@ -14,12 +14,23 @@ import ListBinding from "sap/ui/model/ListBinding";
 import SortFilterColumn from "./SortFilterColumn";
 import Element from "sap/ui/core/Element";
 import Column from "sap/m/Column";
+import ViewSettingsCustomItem from "sap/m/ViewSettingsCustomItem";
+import SimpleForm from "sap/ui/layout/form/SimpleForm";
+import Label from "sap/m/Label";
+import Item from "sap/ui/core/Item";
+import FilterOperator from "sap/ui/model/FilterOperator";
+import Filter from "sap/ui/model/Filter";
+import Select, { Select$ChangeEvent } from "sap/m/Select";
+import Input from "sap/m/Input";
+import { Input$ChangeEvent } from "sap/ui/webc/main/Input";
+import { InputBase$ChangeEvent } from "sap/m/InputBase";
+import DatePicker from "sap/m/DatePicker";
+import Control from "sap/ui/core/Control";
+import JSONModel from "sap/ui/model/json/JSONModel";
 
 /**
  * @namespace com.lichter.mobilesortfilter.control
  */
-
-//ts-ignore
 export default class SortFilterTable extends Table {
 
 	constructor(idOrSettings?: string | $SortFilterTableSettings);
@@ -45,12 +56,45 @@ export default class SortFilterTable extends Table {
 
 	onBeforeRendering(): void {
 		if (!this.initialRenderingDone) {
+			this.initializeModel();
 			this.initializeToolbar();
 			this.initializeSortDialog();
 			this.initializeFilterDialog();
 
 			this.initialRenderingDone = true;
 		}
+	}
+
+	private initializeModel() {
+		if (!this.getCreateFilterDialog()) {
+			return;
+		}
+
+		const data: { [key: string]: object } = {};
+		this.getColumns().forEach((column) => {
+			switch (column.getDataType()) {
+				case SortFilterColumnDataType.Number:
+				case SortFilterColumnDataType.Date:
+					data[column.getId()] = {
+						filterOperator: FilterOperator.BT,
+						filterValue: "",
+						filterValue2: "",
+						filterCount: 0,
+						isSelected: false
+					};
+					break;
+				default:
+					data[column.getId()] = {
+						filterOperator: FilterOperator.Contains,
+						filterValue: "",
+						filterCount: 0,
+						isSelected: false
+					};
+					break;
+			}
+		});
+
+		this.setModel(new JSONModel(data), this.getId());
 	}
 
 	private initializeToolbar(): void {
@@ -123,17 +167,17 @@ export default class SortFilterTable extends Table {
 		});
 
 		const sortDialog = new ViewSettingsDialog({
-			confirm: this.onSortConfirmed.bind(this),
+			confirm: this.onConfirmSortPressed.bind(this),
 			sortItems: sortItems
 		});
 		this.set_sortDialog(sortDialog);
 	}
 
-	private onSortConfirmed(event: ViewSettingsDialog$ConfirmEvent): void {
+	private onConfirmSortPressed(event: ViewSettingsDialog$ConfirmEvent): void {
 		const itemsBinding = this.getBinding("items") as ListBinding;
 		const sortDescending = event.getParameter("sortDescending");
 		const sortItem = event.getParameter("sortItem");
-		if(!itemsBinding || !sortItem) {
+		if (!itemsBinding || !sortItem) {
 			return;
 		}
 
@@ -152,11 +196,11 @@ export default class SortFilterTable extends Table {
 		}
 
 		itemsBinding.sort(new Sorter(
-            column.getSortProperty(),
-            sortDescending,
-            false,
-            comparatorFunction
-        ));
+			column.getSortProperty(),
+			sortDescending,
+			false,
+			comparatorFunction
+		));
 	}
 
 	private initializeFilterDialog() {
@@ -164,8 +208,162 @@ export default class SortFilterTable extends Table {
 			return;
 		}
 
-		//TODO: Implement creation of filter dialog
+		const columns = this.getColumns();
+		const filterItems = columns.map((column) => {
+			const header = column.getHeader() as Text;
+			return new ViewSettingsCustomItem({
+				key: column.getId(),
+				text: header.getText(),
+				filterCount: `{${this.getId()}/${column.getId()}/filterCount}`,
+				selected: `{${this.getId()}/${column.getId()}/isSelected}`,
+				customControl: this.createFilterControl(column)
+			});
+		});
+
+		this.set_filterDialog(new ViewSettingsDialog({
+			confirm: this.onConfirmFiltersPressed.bind(this),
+			reset: this.onResetFiltersPressed.bind(this),
+			filterItems: filterItems
+		}));
 	}
+
+	private createFilterControl(column: SortFilterColumn): Control {
+		//TODO: Add property FilterType to Column and add a Type "Select"
+		switch (column.getDataType()) {
+			case SortFilterColumnDataType.Number:
+				return this.createNumberFilterControl(column);
+			case SortFilterColumnDataType.Date:
+				return this.createDateFilterControl(column);
+			default:
+				return this.createTextFilterControl(column);
+		}
+	}
+
+	private createTextFilterControl(column: SortFilterColumn): SimpleForm {
+		return new SimpleForm({
+			content: [
+				new Label({ text: "Filter Operator" }),
+				new Select({
+					items: [
+						new Item({ key: FilterOperator.EQ, text: "Contains" }),
+						new Item({ key: FilterOperator.Contains, text: "Equals" }),
+					],
+					selectedKey: `{${this.getId()}>/${column.getId()}/filterOperator}`,
+				}),
+
+				new Label({ text: "Filter Value" }),
+				new Input({
+					change: this.onStringFilterValueChanged.bind(this),
+					value: `{${this.getId()}>/${column.getId()}/filterValue}`
+				})
+			]
+		});
+	}
+
+	private onStringFilterValueChanged(event: InputBase$ChangeEvent): void {
+		throw new Error("Method not implemented.");
+	}
+
+	private createDateFilterControl(column: SortFilterColumn): SimpleForm {
+		//TODO: Determine the date format from the binding
+		return new SimpleForm({
+			content: [
+				new Label({ text: "Filter Operator" }),
+				new Select({
+					items: [
+						new Item({ key: FilterOperator.BT, text: "Between" }),
+						new Item({ key: FilterOperator.EQ, text: "Equals" }),
+						new Item({ key: FilterOperator.GT, text: "Greater Than" }),
+						new Item({ key: FilterOperator.GE, text: "Greater or Equals" }),
+						new Item({ key: FilterOperator.LE, text: "Less or Equals" }),
+						new Item({ key: FilterOperator.LT, text: "Less than" }),
+						new Item({ key: FilterOperator.NE, text: "Not Equals" }),
+					],
+					selectedKey: `{${this.getId()}>/${column.getId()}/filterOperator}`,
+					change: this.onDateFilterOperatorChanged.bind(this)
+				}),
+
+				new Label({ text: "Begin Date" }),
+				new DatePicker({
+					value: `{${this.getId()}>/${column.getId()}/filterValue}`,
+					change: this.onDateFilterValueChanged.bind(this)
+				}),
+				//TODO: Somehow the expression binding is not working here
+				new Label({
+					visible: `{= \${${this.getId()}>/${column.getId()}/filterOperator} === '${FilterOperator.BT}'}`,
+					text: "End Date"
+				}),
+				new DatePicker({
+					visible: `{= \${${this.getId()}>/${column.getId()}/filterOperator} === '${FilterOperator.BT}'}`,
+					value: `{${this.getId()}/${column.getId()}/filterValue2}`,
+					change: this.onDateFilterValueChanged.bind(this)
+				})
+			]
+		});
+	}
+
+	private onDateFilterOperatorChanged(event: Select$ChangeEvent): void {
+		throw new Error("Method not implemented.");
+	}
+
+	private onDateFilterValueChanged(event: InputBase$ChangeEvent): void {
+		throw new Error("Method not implemented.");
+	}
+
+	private createNumberFilterControl(column: SortFilterColumn): SimpleForm {
+		return new SimpleForm({
+			content: [
+				new Label({ text: "Filter Operator" }),
+				new Select({
+					items: [
+						new Item({ key: FilterOperator.BT, text: "Between" }),
+						new Item({ key: FilterOperator.EQ, text: "Equals" }),
+						new Item({ key: FilterOperator.GT, text: "Greater Than" }),
+						new Item({ key: FilterOperator.GE, text: "Greater or Equals" }),
+						new Item({ key: FilterOperator.LE, text: "Less or Equals" }),
+						new Item({ key: FilterOperator.LT, text: "Less than" }),
+						new Item({ key: FilterOperator.NE, text: "Not Equals" }),
+					],
+					// change: this.onNumberFilterOperatorChanged.bind(this),
+					selectedKey: `{${this.getId()}>/${column.getId()}/filterOperator}`
+				}),
+
+				new Label({ text: "Value 1" }),
+				new Input({
+					value: `{${this.getId()}>/${column.getId()}/filterValue}`,
+					change: this.onNumberFilterValueChanged.bind(this)
+				}),
+
+				//TODO: Expression Binding is not working here
+				new Label({
+					visible: `{= \${${this.getId()}/${column.getId()}/filterOperator} === '${FilterOperator.BT}'}`,
+					text: "Value 2"
+				}),
+				new Input({
+					visible: `{= \${${this.getId()}>/${column.getId()}/filterOperator} === '${FilterOperator.BT}'}`,
+					value: `{${this.getId()}>/${column.getId()}/filterValue2}`,
+					change: this.onNumberFilterValueChanged.bind(this)
+				}),
+			]
+		});
+	}
+
+	private onNumberFilterOperatorChanged(event: Select$ChangeEvent): void {
+		throw new Error("Method not implemented.");
+	}
+
+	private onNumberFilterValueChanged(event: InputBase$ChangeEvent): void {
+		throw new Error("Method not implemented.");
+	}
+
+	private onConfirmFiltersPressed(event: ViewSettingsDialog$ConfirmEvent): void {
+
+	}
+
+	private onResetFiltersPressed(): void {
+
+	}
+
 
 	/** Must be overriden because the interface generator defines another type which 
 	 * leads to TypeScript errors - see: https://github.com/SAP/ui5-typescript/issues/470
