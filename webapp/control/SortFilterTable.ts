@@ -196,7 +196,7 @@ export default class SortFilterTable extends Table {
 		}
 
 		itemsBinding.sort(new Sorter(
-			column.getSortProperty(),
+			column.getTargetProperty(),
 			sortDescending,
 			false,
 			comparatorFunction
@@ -254,7 +254,11 @@ export default class SortFilterTable extends Table {
 				new Label({ text: "Filter Value" }),
 				new Input({
 					change: this.onStringFilterValueChanged.bind(this),
-					value: `{${this.getId()}>/${column.getId()}/filterValue}`
+					value: {
+						path: `${this.getId()}>/${column.getId()}/filterValue}`,
+						type: column.getFilterPropertyBindingType(),
+						formatOptions: column.getFilterPropertyBindingFormatOptions()
+					}
 				})
 			]
 		});
@@ -266,6 +270,12 @@ export default class SortFilterTable extends Table {
 
 	private createDateFilterControl(column: SortFilterColumn): SimpleForm {
 		//TODO: Determine the date format from the binding
+		// Template not available
+		// Binding can only be accessed via first item and name of aggregations 
+		// (cells, ...) can differ based on the used subclass of sap.m.ListBase.
+		// Afterwards the determination of the bound property is not very nice to retrieve.
+		// Therefore only a binding to the custom column helps but can be optional.
+
 		return new SimpleForm({
 			content: [
 				new Label({ text: "Filter Operator" }),
@@ -285,17 +295,25 @@ export default class SortFilterTable extends Table {
 
 				new Label({ text: "Begin Date" }),
 				new DatePicker({
-					value: `{${this.getId()}>/${column.getId()}/filterValue}`,
+					value: {
+						path: `${this.getId()}>/${column.getId()}/filterValue}`,
+						type: column.getFilterPropertyBindingType(),
+						formatOptions: column.getFilterPropertyBindingFormatOptions()
+					},
 					change: this.onDateFilterValueChanged.bind(this)
 				}),
-				//TODO: Somehow the expression binding is not working here
+				
 				new Label({
 					visible: `{= \${${this.getId()}>/${column.getId()}/filterOperator} === '${FilterOperator.BT}'}`,
 					text: "End Date"
 				}),
 				new DatePicker({
 					visible: `{= \${${this.getId()}>/${column.getId()}/filterOperator} === '${FilterOperator.BT}'}`,
-					value: `{${this.getId()}/${column.getId()}/filterValue2}`,
+					value: {
+						path: `${this.getId()}>/${column.getId()}/filterValue2}`,
+						type: column.getFilterPropertyBindingType(),
+						formatOptions: column.getFilterPropertyBindingFormatOptions()
+					},
 					change: this.onDateFilterValueChanged.bind(this)
 				})
 			]
@@ -324,24 +342,33 @@ export default class SortFilterTable extends Table {
 						new Item({ key: FilterOperator.LT, text: "Less than" }),
 						new Item({ key: FilterOperator.NE, text: "Not Equals" }),
 					],
-					// change: this.onNumberFilterOperatorChanged.bind(this),
+					change: this.onNumberFilterOperatorChanged.bind(this),
 					selectedKey: `{${this.getId()}>/${column.getId()}/filterOperator}`
 				}),
 
 				new Label({ text: "Value 1" }),
 				new Input({
-					value: `{${this.getId()}>/${column.getId()}/filterValue}`,
+					type: 'Number',
+					value: {
+						path: `${this.getId()}>/${column.getId()}/filterValue}`,
+						type: column.getFilterPropertyBindingType(),
+						formatOptions: column.getFilterPropertyBindingFormatOptions()
+					},
 					change: this.onNumberFilterValueChanged.bind(this)
 				}),
 
-				//TODO: Expression Binding is not working here
 				new Label({
 					visible: `{= \${${this.getId()}/${column.getId()}/filterOperator} === '${FilterOperator.BT}'}`,
 					text: "Value 2"
 				}),
 				new Input({
 					visible: `{= \${${this.getId()}>/${column.getId()}/filterOperator} === '${FilterOperator.BT}'}`,
-					value: `{${this.getId()}>/${column.getId()}/filterValue2}`,
+					type: 'Number',
+					value: {
+						path: `${this.getId()}>/${column.getId()}/filterValue2}`,
+						type: column.getFilterPropertyBindingType(),
+						formatOptions: column.getFilterPropertyBindingFormatOptions()
+					},
 					change: this.onNumberFilterValueChanged.bind(this)
 				}),
 			]
@@ -357,11 +384,11 @@ export default class SortFilterTable extends Table {
 	}
 
 	private onConfirmFiltersPressed(event: ViewSettingsDialog$ConfirmEvent): void {
-
+		throw new Error("Method not implemented.");
 	}
 
 	private onResetFiltersPressed(): void {
-
+		throw new Error("Method not implemented.");
 	}
 
 

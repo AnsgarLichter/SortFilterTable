@@ -12,8 +12,10 @@ export default class SortFilterColumn extends Column {
 
     static readonly metadata: MetadataOptions = {
         properties: {
+            "targetProperty": { type: "string", defaultValue: "" },
             "dataType": "com.lichter.mobilesortfilter.control.SortFilterColumnDataType",
-            "sortProperty": { type: "string", defaultValue: "" },
+            "filterPropertyBindingType": { type: "sap.ui.model.Type", defaultValue: "" },
+            "filterPropertyBindingFormatOptions": { type: "object", defaultValue: null },
         },
         aggregations: {
             "_sortDialog": { type: "sap.m.ViewSettingsDialog", multiple: false },

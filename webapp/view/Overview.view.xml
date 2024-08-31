@@ -33,27 +33,34 @@
                 </cc:headerToolbar> -->
                 <cc:columns>
                     <cc:SortFilterColumn 
-                        sortProperty="name" 
+                        targetProperty="name" 
                         dataType="String">
                         <Text text="Driver Name" />
                     </cc:SortFilterColumn>
                     <cc:SortFilterColumn 
-                        sortProperty="nationality"
+                        targetProperty="nationality"
                         dataType="String">
                         <Text text="Nationality" />
                     </cc:SortFilterColumn>
                     <cc:SortFilterColumn 
-                        sortProperty="number"
+                        targetProperty="number"
                         dataType="Number">
                         <Text text="Number" />
                     </cc:SortFilterColumn>
                     <cc:SortFilterColumn 
-                        sortProperty="birthday"
-                        dataType="Date">
+                        targetProperty="birthday"
+                        dataType="Date"
+                        filterPropertyBindingType="sap.ui.model.type.Date"
+                        filterPropertyBindingFormatOptions="{
+                            pattern: 'dd.MM.yyyy',
+                            source: {
+                                pattern: 'dd.MM.yyyy' 
+                            }
+                        }">
                         <Text text="Birthday" />
                     </cc:SortFilterColumn>
                     <cc:SortFilterColumn 
-                        sortProperty="team"
+                        targetProperty="team"
                         dataType="String">
                         <Text text="Team" />
                     </cc:SortFilterColumn>
