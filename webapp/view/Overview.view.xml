@@ -3,6 +3,10 @@
     xmlns="sap.m"
     xmlns:cc="com.lichter.mobilesortfilter.control"
     xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    core:require="{
+        comparator: 'com/lichter/mobilesortfilter/utils/Comparator'
+    }"
     displayBlock="true">
 
     <Page id="page"
@@ -33,36 +37,69 @@
                 </cc:headerToolbar> -->
                 <cc:columns>
                     <cc:SortFilterColumn 
-                        targetProperty="name" 
-                        dataType="String">
-                        <Text text="Driver Name" />
+                        targetProperty="name"
+                        sortComparator="comparator.compareStrings">
+                        <cc:header>
+                            <Text text="Driver Name" />
+                        </cc:header>
+                        <cc:filter>
+                            <cc:SortFilterColumnFilter />
+                        </cc:filter>
                     </cc:SortFilterColumn>
                     <cc:SortFilterColumn 
                         targetProperty="nationality"
-                        dataType="String">
-                        <Text text="Nationality" />
+                        sortComparator="comparator.compareStrings">
+                        <cc:header>
+                            <Text text="Nationality" />
+                        </cc:header>
+                        <cc:filter>
+                            <cc:SortFilterColumnFilter />
+                        </cc:filter>
                     </cc:SortFilterColumn>
                     <cc:SortFilterColumn 
                         targetProperty="number"
-                        dataType="Number">
-                        <Text text="Number" />
+                        sortComparator="comparator.compareNumbers">
+                        <cc:header>
+                            <Text text="Number" />
+                        </cc:header>
+                        <cc:filter>
+                            <cc:SortFilterColumnFilterNumber />
+                        </cc:filter>
                     </cc:SortFilterColumn>
-                    <cc:SortFilterColumn 
+                    <cc:SortFilterColumnDate 
                         targetProperty="birthday"
-                        dataType="Date"
-                        filterPropertyBindingType="sap.ui.model.type.Date"
-                        filterPropertyBindingFormatOptions="{
+                        sortComparator="comparator.compareDateStrings"
+                        propertyBindingType="sap.ui.model.type.Date"
+                        propertyBindingFormatOptions="{
                             pattern: 'dd.MM.yyyy',
                             source: {
                                 pattern: 'dd.MM.yyyy' 
                             }
                         }">
-                        <Text text="Birthday" />
-                    </cc:SortFilterColumn>
+                        <cc:header>
+                            <Text text="Birthday" />
+                        </cc:header>
+                        <cc:filter>
+                            <cc:SortFilterColumnFilter
+                                propertyBindingType="sap.ui.model.type.Date"
+                                propertyBindingFormatOptions="{
+                                    pattern: 'dd.MM.yyyy',
+                                    source: {
+                                        pattern: 'dd.MM.yyyy' 
+                                    }
+                                }"
+                             />
+                        </cc:filter>
+                    </cc:SortFilterColumnDate>
                     <cc:SortFilterColumn 
                         targetProperty="team"
-                        dataType="String">
-                        <Text text="Team" />
+                        sortComparator="comparator.compareStrings">
+                        <cc:header>
+                            <Text text="Team" />
+                        </cc:header>
+                        <cc:filter>
+                            <cc:SortFilterColumnFilter />
+                        </cc:filter>
                     </cc:SortFilterColumn>
                 </cc:columns>
                 <cc:items>

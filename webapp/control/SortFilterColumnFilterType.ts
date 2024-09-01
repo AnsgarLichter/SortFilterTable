@@ -9,10 +9,14 @@ import DataType from "sap/ui/base/DataType";
 * @enum {string}
 * @public
 */
-export enum SortFilterColumnDataType {
+export enum SortFilterColumnFilterType {
     String = "String",
     Number = "Number",
-    Date = "Date"
+    Date = "Date",
+    Select = "Select",
 };
 
-DataType.registerEnum("com.lichter.mobilesortfilter.control.SortFilterColumnDataType", SortFilterColumnDataType);
+DataType.registerEnum(
+    "com.lichter.mobilesortfilter.control.SortFilterColumnFilterType", 
+    SortFilterColumnFilterType
+);

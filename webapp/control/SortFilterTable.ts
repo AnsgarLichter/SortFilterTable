@@ -7,8 +7,7 @@ import Button from "sap/m/Button";
 import ViewSettingsDialog, { ViewSettingsDialog$ConfirmEvent } from "sap/m/ViewSettingsDialog";
 import ViewSettingsItem from "sap/m/ViewSettingsItem";
 import Text from "sap/m/Text";
-import Comparator from "../utils/comparator";
-import { SortFilterColumnDataType } from "./SortFilterColumnDataType";
+import { SortFilterColumnFilterType } from "./SortFilterColumnFilterType";
 import Sorter from "sap/ui/model/Sorter";
 import ListBinding from "sap/ui/model/ListBinding";
 import SortFilterColumn from "./SortFilterColumn";
@@ -19,14 +18,16 @@ import SimpleForm from "sap/ui/layout/form/SimpleForm";
 import Label from "sap/m/Label";
 import Item from "sap/ui/core/Item";
 import FilterOperator from "sap/ui/model/FilterOperator";
-import Filter from "sap/ui/model/Filter";
 import Select, { Select$ChangeEvent } from "sap/m/Select";
 import Input from "sap/m/Input";
-import { Input$ChangeEvent } from "sap/ui/webc/main/Input";
 import { InputBase$ChangeEvent } from "sap/m/InputBase";
 import DatePicker from "sap/m/DatePicker";
 import Control from "sap/ui/core/Control";
 import JSONModel from "sap/ui/model/json/JSONModel";
+import MultiComboBox, { MultiComboBox$SelectionFinishEvent } from "sap/m/MultiComboBox";
+import Log from "sap/base/Log";
+import SortFilterColumnFilterSelect from "./SortFilterColumnFilterSelect";
+import SortFilterColumnFilter from "./SortFilterColumnFilter";
 
 /**
  * @namespace com.lichter.mobilesortfilter.control
@@ -44,10 +45,21 @@ export default class SortFilterTable extends Table {
 			"createFilterDialog": { type: "boolean", defaultValue: true }
 		},
 		aggregations: {
-			"columns": { type: "com.lichter.mobilesortfilter.control.SortFilterColumn", multiple: true },
-			"_sortDialog": { type: "sap.m.ViewSettingsDialog", multiple: false },
-			"_filterDialog": { type: "sap.m.ViewSettingsDialog", multiple: false },
-		},
+			"columns": {
+				type: "com.lichter.mobilesortfilter.control.SortFilterColumn",
+				multiple: true
+			},
+			"_sortDialog": {
+				type: "sap.m.ViewSettingsDialog",
+				multiple: false,
+				visibility: "hidden"
+			},
+			"_filterDialog": {
+				type: "sap.m.ViewSettingsDialog",
+				multiple: false,
+				visibility: "hidden"
+			},
+		}
 	};
 
 	static renderer = "sap.m.TableRenderer";
@@ -71,10 +83,17 @@ export default class SortFilterTable extends Table {
 		}
 
 		const data: { [key: string]: object } = {};
-		this.getColumns().forEach((column) => {
-			switch (column.getDataType()) {
-				case SortFilterColumnDataType.Number:
-				case SortFilterColumnDataType.Date:
+		//TODO: Create model based on type of filter aggregation of column
+
+		/* this.getColumns().forEach((column) => {
+			const filter = column.getFilter();
+			if (!filter) {
+				Log.error(`A filter must be defined for the column ${column.getId()} to be filterable.`);
+			}
+			// TODO: At runtime filter is just an object? I think the type definition is wrong
+			switch (filter.getType()) {
+				case SortFilterColumnFilterType.Number:
+				case SortFilterColumnFilterType.Date:
 					data[column.getId()] = {
 						filterOperator: FilterOperator.BT,
 						filterValue: "",
@@ -92,7 +111,7 @@ export default class SortFilterTable extends Table {
 					};
 					break;
 			}
-		});
+		}); */
 
 		this.setModel(new JSONModel(data), this.getId());
 	}
@@ -137,7 +156,7 @@ export default class SortFilterTable extends Table {
 	}
 
 	private onOpenSortDialogPressed(): void {
-		this.get_sortDialog().open();
+		this.getSortDialog().open();
 	}
 
 	private createFilterButton(): Button {
@@ -148,7 +167,7 @@ export default class SortFilterTable extends Table {
 	}
 
 	private onOpenFilterDialogPressed(): void {
-		this.get_filterDialog().open();
+		this.getFilterDialog().open();
 	}
 
 	private initializeSortDialog() {
@@ -170,7 +189,7 @@ export default class SortFilterTable extends Table {
 			confirm: this.onConfirmSortPressed.bind(this),
 			sortItems: sortItems
 		});
-		this.set_sortDialog(sortDialog);
+		this.setAggregation("_sortDialog", sortDialog);
 	}
 
 	private onConfirmSortPressed(event: ViewSettingsDialog$ConfirmEvent): void {
@@ -182,24 +201,11 @@ export default class SortFilterTable extends Table {
 		}
 
 		const column = Element.getElementById(sortItem.getKey()) as SortFilterColumn;
-		let comparatorFunction;
-		switch (column.getDataType()) {
-			case SortFilterColumnDataType.Number:
-				comparatorFunction = Comparator.compareNumbers;
-				break;
-			case SortFilterColumnDataType.Date:
-				comparatorFunction = Comparator.compareDateStrings;
-				break;
-			default:
-				comparatorFunction = Comparator.compareStrings;
-				break;
-		}
-
 		itemsBinding.sort(new Sorter(
 			column.getTargetProperty(),
 			sortDescending,
 			false,
-			comparatorFunction
+			column.getSortComparator()
 		));
 	}
 
@@ -220,166 +226,41 @@ export default class SortFilterTable extends Table {
 			});
 		});
 
-		this.set_filterDialog(new ViewSettingsDialog({
-			confirm: this.onConfirmFiltersPressed.bind(this),
-			reset: this.onResetFiltersPressed.bind(this),
-			filterItems: filterItems
-		}));
+		this.setAggregation(
+			"_filterDialog",
+			new ViewSettingsDialog({
+				confirm: this.onConfirmFiltersPressed.bind(this),
+				reset: this.onResetFiltersPressed.bind(this),
+				filterItems: filterItems
+			}));
 	}
 
 	private createFilterControl(column: SortFilterColumn): Control {
-		//TODO: Add property FilterType to Column and add a Type "Select"
-		switch (column.getDataType()) {
-			case SortFilterColumnDataType.Number:
-				return this.createNumberFilterControl(column);
-			case SortFilterColumnDataType.Date:
-				return this.createDateFilterControl(column);
-			default:
-				return this.createTextFilterControl(column);
-		}
+		return column.getFilterItem() as Control;
 	}
 
-	private createTextFilterControl(column: SortFilterColumn): SimpleForm {
-		return new SimpleForm({
-			content: [
-				new Label({ text: "Filter Operator" }),
-				new Select({
-					items: [
-						new Item({ key: FilterOperator.EQ, text: "Contains" }),
-						new Item({ key: FilterOperator.Contains, text: "Equals" }),
-					],
-					selectedKey: `{${this.getId()}>/${column.getId()}/filterOperator}`,
-				}),
-
-				new Label({ text: "Filter Value" }),
-				new Input({
-					change: this.onStringFilterValueChanged.bind(this),
-					value: {
-						path: `${this.getId()}>/${column.getId()}/filterValue}`,
-						type: column.getFilterPropertyBindingType(),
-						formatOptions: column.getFilterPropertyBindingFormatOptions()
-					}
-				})
-			]
-		});
-	}
-
-	private onStringFilterValueChanged(event: InputBase$ChangeEvent): void {
-		throw new Error("Method not implemented.");
-	}
-
-	private createDateFilterControl(column: SortFilterColumn): SimpleForm {
-		//TODO: Determine the date format from the binding
-		// Template not available
-		// Binding can only be accessed via first item and name of aggregations 
-		// (cells, ...) can differ based on the used subclass of sap.m.ListBase.
-		// Afterwards the determination of the bound property is not very nice to retrieve.
-		// Therefore only a binding to the custom column helps but can be optional.
+	/*private createSelectFilterControl(column: SortFilterColumn): SimpleForm {
+		const filter = column.getFilter() as SortFilterColumnFilterSelect;
 
 		return new SimpleForm({
 			content: [
 				new Label({ text: "Filter Operator" }),
-				new Select({
-					items: [
-						new Item({ key: FilterOperator.BT, text: "Between" }),
-						new Item({ key: FilterOperator.EQ, text: "Equals" }),
-						new Item({ key: FilterOperator.GT, text: "Greater Than" }),
-						new Item({ key: FilterOperator.GE, text: "Greater or Equals" }),
-						new Item({ key: FilterOperator.LE, text: "Less or Equals" }),
-						new Item({ key: FilterOperator.LT, text: "Less than" }),
-						new Item({ key: FilterOperator.NE, text: "Not Equals" }),
-					],
-					selectedKey: `{${this.getId()}>/${column.getId()}/filterOperator}`,
-					change: this.onDateFilterOperatorChanged.bind(this)
-				}),
-
-				new Label({ text: "Begin Date" }),
-				new DatePicker({
-					value: {
-						path: `${this.getId()}>/${column.getId()}/filterValue}`,
-						type: column.getFilterPropertyBindingType(),
-						formatOptions: column.getFilterPropertyBindingFormatOptions()
+				new MultiComboBox({
+					items: {
+						path: `{${filter.getMasterdataItemsBinding()}}`,
+						template: new Item({
+							key: `{${filter.getMasterdataKey()}}`,
+							text: `{${filter.getMasterdataText()}}`
+						})
 					},
-					change: this.onDateFilterValueChanged.bind(this)
-				}),
-				
-				new Label({
-					visible: `{= \${${this.getId()}>/${column.getId()}/filterOperator} === '${FilterOperator.BT}'}`,
-					text: "End Date"
-				}),
-				new DatePicker({
-					visible: `{= \${${this.getId()}>/${column.getId()}/filterOperator} === '${FilterOperator.BT}'}`,
-					value: {
-						path: `${this.getId()}>/${column.getId()}/filterValue2}`,
-						type: column.getFilterPropertyBindingType(),
-						formatOptions: column.getFilterPropertyBindingFormatOptions()
-					},
-					change: this.onDateFilterValueChanged.bind(this)
-				})
-			]
-		});
-	}
-
-	private onDateFilterOperatorChanged(event: Select$ChangeEvent): void {
-		throw new Error("Method not implemented.");
-	}
-
-	private onDateFilterValueChanged(event: InputBase$ChangeEvent): void {
-		throw new Error("Method not implemented.");
-	}
-
-	private createNumberFilterControl(column: SortFilterColumn): SimpleForm {
-		return new SimpleForm({
-			content: [
-				new Label({ text: "Filter Operator" }),
-				new Select({
-					items: [
-						new Item({ key: FilterOperator.BT, text: "Between" }),
-						new Item({ key: FilterOperator.EQ, text: "Equals" }),
-						new Item({ key: FilterOperator.GT, text: "Greater Than" }),
-						new Item({ key: FilterOperator.GE, text: "Greater or Equals" }),
-						new Item({ key: FilterOperator.LE, text: "Less or Equals" }),
-						new Item({ key: FilterOperator.LT, text: "Less than" }),
-						new Item({ key: FilterOperator.NE, text: "Not Equals" }),
-					],
-					change: this.onNumberFilterOperatorChanged.bind(this),
-					selectedKey: `{${this.getId()}>/${column.getId()}/filterOperator}`
-				}),
-
-				new Label({ text: "Value 1" }),
-				new Input({
-					type: 'Number',
-					value: {
-						path: `${this.getId()}>/${column.getId()}/filterValue}`,
-						type: column.getFilterPropertyBindingType(),
-						formatOptions: column.getFilterPropertyBindingFormatOptions()
-					},
-					change: this.onNumberFilterValueChanged.bind(this)
-				}),
-
-				new Label({
-					visible: `{= \${${this.getId()}/${column.getId()}/filterOperator} === '${FilterOperator.BT}'}`,
-					text: "Value 2"
-				}),
-				new Input({
-					visible: `{= \${${this.getId()}>/${column.getId()}/filterOperator} === '${FilterOperator.BT}'}`,
-					type: 'Number',
-					value: {
-						path: `${this.getId()}>/${column.getId()}/filterValue2}`,
-						type: column.getFilterPropertyBindingType(),
-						formatOptions: column.getFilterPropertyBindingFormatOptions()
-					},
-					change: this.onNumberFilterValueChanged.bind(this)
+					selectedKeys: `{${this.getId()}>/${column.getId()}/selectedKeys}`,
+					selectionFinish: this.onSelectFilterOperatorSelectionFinished.bind(this),
 				}),
 			]
 		});
-	}
+	} */
 
-	private onNumberFilterOperatorChanged(event: Select$ChangeEvent): void {
-		throw new Error("Method not implemented.");
-	}
-
-	private onNumberFilterValueChanged(event: InputBase$ChangeEvent): void {
+	private onSelectFilterOperatorSelectionFinished(event: MultiComboBox$SelectionFinishEvent): void {
 		throw new Error("Method not implemented.");
 	}
 
@@ -389,6 +270,14 @@ export default class SortFilterTable extends Table {
 
 	private onResetFiltersPressed(): void {
 		throw new Error("Method not implemented.");
+	}
+
+	private getSortDialog(): ViewSettingsDialog {
+		return this.getAggregation("_sortDialog") as ViewSettingsDialog;
+	}
+
+	private getFilterDialog(): ViewSettingsDialog {
+		return this.getAggregation("_filterDialog") as ViewSettingsDialog;
 	}
 
 

@@ -1,5 +1,4 @@
 import SortFilterColumn from "com/lichter/mobilesortfilter/control/SortFilterColumn";
-import ViewSettingsDialog from "sap/m/ViewSettingsDialog";
 import { PropertyBindingInfo } from "sap/ui/base/ManagedObject";
 import { AggregationBindingInfo } from "sap/ui/base/ManagedObject";
 import { $TableSettings } from "sap/m/Table";
@@ -14,8 +13,6 @@ declare module "./SortFilterTable" {
         createSortDialog?: boolean | PropertyBindingInfo | `{${string}}`;
         createFilterDialog?: boolean | PropertyBindingInfo | `{${string}}`;
         columns?: SortFilterColumn[] | SortFilterColumn | AggregationBindingInfo | `{${string}}`;
-        _sortDialog?: ViewSettingsDialog;
-        _filterDialog?: ViewSettingsDialog;
     }
 
     export default interface SortFilterTable {
@@ -40,15 +37,5 @@ declare module "./SortFilterTable" {
         removeAllColumns(): SortFilterColumn[];
         indexOfColumn(columns: SortFilterColumn): number;
         destroyColumns(): this;
-
-        // aggregation: _sortDialog
-        get_sortDialog(): ViewSettingsDialog;
-        set_sortDialog(_sortDialog: ViewSettingsDialog): this;
-        destroy_sortDialog(): this;
-
-        // aggregation: _filterDialog
-        get_filterDialog(): ViewSettingsDialog;
-        set_filterDialog(_filterDialog: ViewSettingsDialog): this;
-        destroy_filterDialog(): this;
     }
 }

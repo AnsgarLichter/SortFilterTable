@@ -1,6 +1,5 @@
-import SortFilterColumnDataType from "com/lichter/mobilesortfilter/control/SortFilterColumnDataType";
 import Type from "sap/ui/model/Type";
-import ViewSettingsDialog from "sap/m/ViewSettingsDialog";
+import SortFilterColumnFilter from "com/lichter/mobilesortfilter/control/SortFilterColumnFilter";
 import { PropertyBindingInfo } from "sap/ui/base/ManagedObject";
 import { $ColumnSettings } from "sap/m/Column";
 
@@ -11,11 +10,10 @@ declare module "./SortFilterColumn" {
      */
     interface $SortFilterColumnSettings extends $ColumnSettings {
         targetProperty?: string | PropertyBindingInfo;
-        dataType?: SortFilterColumnDataType | PropertyBindingInfo | `{${string}}`;
-        filterPropertyBindingType?: Type | PropertyBindingInfo | `{${string}}`;
-        filterPropertyBindingFormatOptions?: object | PropertyBindingInfo | `{${string}}`;
-        _sortDialog?: ViewSettingsDialog;
-        _filterDialog?: ViewSettingsDialog;
+        sortComparator?: Function | PropertyBindingInfo | `{${string}}`;
+        propertyBindingType?: Type | PropertyBindingInfo | `{${string}}`;
+        propertyBindingFormatOptions?: object | PropertyBindingInfo | `{${string}}`;
+        filter?: SortFilterColumnFilter;
     }
 
     export default interface SortFilterColumn {
@@ -24,26 +22,21 @@ declare module "./SortFilterColumn" {
         getTargetProperty(): string;
         setTargetProperty(targetProperty: string): this;
 
-        // property: dataType
-        getDataType(): SortFilterColumnDataType;
-        setDataType(dataType: SortFilterColumnDataType): this;
+        // property: sortComparator
+        getSortComparator(): Function;
+        setSortComparator(sortComparator: Function): this;
 
-        // property: filterPropertyBindingType
-        getFilterPropertyBindingType(): Type;
-        setFilterPropertyBindingType(filterPropertyBindingType: Type): this;
+        // property: propertyBindingType
+        getPropertyBindingType(): Type;
+        setPropertyBindingType(propertyBindingType: Type): this;
 
-        // property: filterPropertyBindingFormatOptions
-        getFilterPropertyBindingFormatOptions(): object;
-        setFilterPropertyBindingFormatOptions(filterPropertyBindingFormatOptions: object): this;
+        // property: propertyBindingFormatOptions
+        getPropertyBindingFormatOptions(): object;
+        setPropertyBindingFormatOptions(propertyBindingFormatOptions: object): this;
 
-        // aggregation: _sortDialog
-        get_sortDialog(): ViewSettingsDialog;
-        set_sortDialog(_sortDialog: ViewSettingsDialog): this;
-        destroy_sortDialog(): this;
-
-        // aggregation: _filterDialog
-        get_filterDialog(): ViewSettingsDialog;
-        set_filterDialog(_filterDialog: ViewSettingsDialog): this;
-        destroy_filterDialog(): this;
+        // aggregation: filter
+        getFilter(): SortFilterColumnFilter;
+        setFilter(filter: SortFilterColumnFilter): this;
+        destroyFilter(): this;
     }
 }
