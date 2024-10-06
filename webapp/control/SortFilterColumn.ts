@@ -1,6 +1,5 @@
 import Column from "sap/m/Column";
 import { MetadataOptions } from "sap/ui/core/Element";
-import SortFilterColumnFilter from "./SortFilterColumnFilter";
 import Control from "sap/ui/core/Control";
 import SimpleForm from "sap/ui/layout/form/SimpleForm";
 import Input from "sap/m/Input";
@@ -9,7 +8,6 @@ import Select from "sap/m/Select";
 import Item from "sap/ui/core/Item";
 import FilterOperator from "sap/ui/model/FilterOperator";
 import { InputBase$ChangeEvent } from "sap/m/InputBase";
-import Table from "sap/m/Table";
 import SortFilterTable from "./SortFilterTable";
 
 /**
@@ -27,10 +25,6 @@ export default class SortFilterColumn extends Column {
             "sortComparator": { type: "function", defaultValue: null },
             "propertyBindingType": { type: "sap.ui.model.Type", defaultValue: null },
             "propertyBindingFormatOptions": { type: "object", defaultValue: null },
-        },
-        aggregations: {
-            // TODO: REMOVE once all filter controls are transformed
-            "filter": { type: "com.lichter.mobilesortfilter.control.SortFilterColumnFilter", multiple: false },
         }
     };
 

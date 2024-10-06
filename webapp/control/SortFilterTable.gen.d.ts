@@ -33,7 +33,7 @@ declare module "./SortFilterTable" {
         getColumns(): SortFilterColumn[];
         addColumn(columns: SortFilterColumn): this;
         insertColumn(columns: SortFilterColumn, index: number): this;
-        removeColumn(columns: number | string | SortFilterColumn): this;
+        removeColumn(columns: number | string | SortFilterColumn): SortFilterColumn | null;
         removeAllColumns(): SortFilterColumn[];
         indexOfColumn(columns: SortFilterColumn): number;
         destroyColumns(): this;

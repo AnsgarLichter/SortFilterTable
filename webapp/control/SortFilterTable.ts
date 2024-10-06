@@ -7,27 +7,16 @@ import Button from "sap/m/Button";
 import ViewSettingsDialog, { ViewSettingsDialog$ConfirmEvent } from "sap/m/ViewSettingsDialog";
 import ViewSettingsItem from "sap/m/ViewSettingsItem";
 import Text from "sap/m/Text";
-import { SortFilterColumnFilterType } from "./SortFilterColumnFilterType";
 import Sorter from "sap/ui/model/Sorter";
 import ListBinding from "sap/ui/model/ListBinding";
 import SortFilterColumn from "./SortFilterColumn";
 import Element from "sap/ui/core/Element";
 import Column from "sap/m/Column";
 import ViewSettingsCustomItem from "sap/m/ViewSettingsCustomItem";
-import SimpleForm from "sap/ui/layout/form/SimpleForm";
-import Label from "sap/m/Label";
-import Item from "sap/ui/core/Item";
-import FilterOperator from "sap/ui/model/FilterOperator";
-import Select, { Select$ChangeEvent } from "sap/m/Select";
-import Input from "sap/m/Input";
-import { InputBase$ChangeEvent } from "sap/m/InputBase";
-import DatePicker from "sap/m/DatePicker";
 import Control from "sap/ui/core/Control";
 import JSONModel from "sap/ui/model/json/JSONModel";
-import MultiComboBox, { MultiComboBox$SelectionFinishEvent } from "sap/m/MultiComboBox";
+import { MultiComboBox$SelectionFinishEvent } from "sap/m/MultiComboBox";
 import Log from "sap/base/Log";
-import SortFilterColumnFilterSelect from "./SortFilterColumnFilterSelect";
-import SortFilterColumnFilter from "./SortFilterColumnFilter";
 
 /**
  * @namespace com.lichter.mobilesortfilter.control

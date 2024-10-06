@@ -1,5 +1,4 @@
 import Type from "sap/ui/model/Type";
-import SortFilterColumnFilter from "com/lichter/mobilesortfilter/control/SortFilterColumnFilter";
 import { PropertyBindingInfo } from "sap/ui/base/ManagedObject";
 import { $ColumnSettings } from "sap/m/Column";
 
@@ -13,7 +12,6 @@ declare module "./SortFilterColumn" {
         sortComparator?: Function | PropertyBindingInfo | `{${string}}`;
         propertyBindingType?: Type | PropertyBindingInfo | `{${string}}`;
         propertyBindingFormatOptions?: object | PropertyBindingInfo | `{${string}}`;
-        filter?: SortFilterColumnFilter;
     }
 
     export default interface SortFilterColumn {
@@ -33,10 +31,5 @@ declare module "./SortFilterColumn" {
         // property: propertyBindingFormatOptions
         getPropertyBindingFormatOptions(): object;
         setPropertyBindingFormatOptions(propertyBindingFormatOptions: object): this;
-
-        // aggregation: filter
-        getFilter(): SortFilterColumnFilter;
-        setFilter(filter: SortFilterColumnFilter): this;
-        destroyFilter(): this;
     }
 }

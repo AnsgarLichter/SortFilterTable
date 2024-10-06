@@ -42,30 +42,24 @@
                         <cc:header>
                             <Text text="Driver Name" />
                         </cc:header>
-                        <cc:filter>
-                            <cc:SortFilterColumnFilter />
-                        </cc:filter>
                     </cc:SortFilterColumn>
-                    <cc:SortFilterColumn 
+                    <cc:SortFilterColumnSelect 
                         targetProperty="nationality"
-                        sortComparator="comparator.compareStrings">
+                        sortComparator="comparator.compareStrings"
+                        masterdataItemsBinding="nationalities>/nationalities"
+                        masterdataKeyBinding="nationalities>name"
+                        masterdataTextBinding="nationalities>name">
                         <cc:header>
                             <Text text="Nationality" />
                         </cc:header>
-                        <cc:filter>
-                            <cc:SortFilterColumnFilter />
-                        </cc:filter>
-                    </cc:SortFilterColumn>
-                    <cc:SortFilterColumn 
+                    </cc:SortFilterColumnSelect>
+                    <cc:SortFilterColumnNumber 
                         targetProperty="number"
                         sortComparator="comparator.compareNumbers">
                         <cc:header>
                             <Text text="Number" />
                         </cc:header>
-                        <cc:filter>
-                            <cc:SortFilterColumnFilterNumber />
-                        </cc:filter>
-                    </cc:SortFilterColumn>
+                    </cc:SortFilterColumnNumber>
                     <cc:SortFilterColumnDate 
                         targetProperty="birthday"
                         sortComparator="comparator.compareDateStrings"
@@ -79,28 +73,17 @@
                         <cc:header>
                             <Text text="Birthday" />
                         </cc:header>
-                        <cc:filter>
-                            <cc:SortFilterColumnFilter
-                                propertyBindingType="sap.ui.model.type.Date"
-                                propertyBindingFormatOptions="{
-                                    pattern: 'dd.MM.yyyy',
-                                    source: {
-                                        pattern: 'dd.MM.yyyy' 
-                                    }
-                                }"
-                             />
-                        </cc:filter>
                     </cc:SortFilterColumnDate>
-                    <cc:SortFilterColumn 
+                    <cc:SortFilterColumnSelect 
                         targetProperty="team"
-                        sortComparator="comparator.compareStrings">
+                        sortComparator="comparator.compareStrings"
+                        masterdataItemsBinding="teams>/teams"
+                        masterdataKeyBinding="teams>name"
+                        masterdataTextBinding="teams>name">
                         <cc:header>
                             <Text text="Team" />
                         </cc:header>
-                        <cc:filter>
-                            <cc:SortFilterColumnFilter />
-                        </cc:filter>
-                    </cc:SortFilterColumn>
+                    </cc:SortFilterColumnSelect>
                 </cc:columns>
                 <cc:items>
                     <ColumnListItem vAlign="Middle"
