@@ -11,16 +11,16 @@
   "main": "webapp/index.html",
   "devDependencies": {
     "@babel/eslint-parser": "7.25.1",
-    "@sap/ux-ui5-tooling": "1",
+    "@sap/ux-ui5-tooling": "^1.15.1",
     "@sapui5/ts-types-esm": "~1.127.1",
-    "@typescript-eslint/eslint-plugin": "^8.2.0",
-    "@typescript-eslint/parser": "^8.2.0",
-    "@ui5/cli": "^4.0.5",
-    "@ui5/ts-interface-generator": "^0.8.3",
+    "@typescript-eslint/eslint-plugin": "^8.8.0",
+    "@typescript-eslint/parser": "^8.8.0",
+    "@ui5/cli": "^4.0.8",
+    "@ui5/ts-interface-generator": "^0.9.0",
     "eslint": "9.9.1",
     "eslint-plugin-fiori-custom": "2.6.7",
-    "typescript": "^5.5.4",
-    "ui5-tooling-transpile": "^3.4.8"
+    "typescript": "^5.6.2",
+    "ui5-tooling-transpile": "^3.5.0"
   },
   "scripts": {
     "start": "fiori run --open \"test/flpSandbox.html?sap-ui-xx-viewCache=false#comlichtermobilesortfilter-display\"",
