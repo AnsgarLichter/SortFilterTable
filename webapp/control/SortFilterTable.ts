@@ -202,10 +202,12 @@ export default class SortFilterTable extends Table {
 	}
 
 	private onConfirmFiltersPressed(event: ViewSettingsDialog$ConfirmEvent): void {
+		//TODO: Implement
 		throw new Error("Method not implemented.");
 	}
 
 	private onResetFiltersPressed(): void {
+		//TODO: Implement
 		throw new Error("Method not implemented.");
 	}
 
@@ -215,13 +217,5 @@ export default class SortFilterTable extends Table {
 
 	private getFilterDialog(): ViewSettingsDialog {
 		return this.getAggregation("_filterDialog") as ViewSettingsDialog;
-	}
-
-
-	/** Must be overriden because the interface generator defines another type which 
-	 * leads to TypeScript errors - see: https://github.com/SAP/ui5-typescript/issues/470
-	 */
-	removeColumn(vColumn: int | string | SortFilterColumn): SortFilterColumn | null {
-		return super.removeColumn(vColumn as Column) as SortFilterColumn;
 	}
 }
