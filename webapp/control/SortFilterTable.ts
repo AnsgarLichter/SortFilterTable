@@ -13,10 +13,11 @@ import SortFilterColumn from "./SortFilterColumn";
 import Element from "sap/ui/core/Element";
 import Column from "sap/m/Column";
 import ViewSettingsCustomItem from "sap/m/ViewSettingsCustomItem";
-import Control from "sap/ui/core/Control";
 import JSONModel from "sap/ui/model/json/JSONModel";
-import { MultiComboBox$SelectionFinishEvent } from "sap/m/MultiComboBox";
 import Log from "sap/base/Log";
+import SortFilterColumnDate from "./SortFilterColumnDate";
+import SortFilterColumnNumber from "./SortFilterColumnNumber";
+import SortFilterColumnSelect from "./SortFilterColumnSelect";
 
 /**
  * @namespace com.lichter.mobilesortfilter.control
@@ -74,33 +75,9 @@ export default class SortFilterTable extends Table {
 		const data: { [key: string]: object } = {};
 		//TODO: Create model based on type of filter aggregation of column
 
-		/* this.getColumns().forEach((column) => {
-			const filter = column.getFilter();
-			if (!filter) {
-				Log.error(`A filter must be defined for the column ${column.getId()} to be filterable.`);
-			}
-			// TODO: At runtime filter is just an object? I think the type definition is wrong
-			switch (filter.getType()) {
-				case SortFilterColumnFilterType.Number:
-				case SortFilterColumnFilterType.Date:
-					data[column.getId()] = {
-						filterOperator: FilterOperator.BT,
-						filterValue: "",
-						filterValue2: "",
-						filterCount: 0,
-						isSelected: false
-					};
-					break;
-				default:
-					data[column.getId()] = {
-						filterOperator: FilterOperator.Contains,
-						filterValue: "",
-						filterCount: 0,
-						isSelected: false
-					};
-					break;
-			}
-		}); */
+		this.getColumns().forEach((column) => {
+			data[column.getId()] = column.getDefaultFilterSettings();
+		});
 
 		this.setModel(new JSONModel(data), this.getId());
 	}
@@ -166,7 +143,7 @@ export default class SortFilterTable extends Table {
 
 		const columns = this.getColumns();
 		const sortItems = columns.map((column) => {
-			// TODO: What TODO if it is not a text header?
+			// TODO: What if it is not a text header?
 			const header = column.getHeader() as Text;
 			return new ViewSettingsItem({
 				key: column.getId(),
@@ -209,9 +186,9 @@ export default class SortFilterTable extends Table {
 			return new ViewSettingsCustomItem({
 				key: column.getId(),
 				text: header.getText(),
-				filterCount: `{${this.getId()}/${column.getId()}/filterCount}`,
-				selected: `{${this.getId()}/${column.getId()}/isSelected}`,
-				customControl: this.createFilterControl(column)
+				filterCount: `{${this.getId()}>/${column.getId()}/filterCount}`,
+				selected: `{${this.getId()}>/${column.getId()}/isSelected}`,
+				customControl: column.getFilterItem()
 			});
 		});
 
@@ -222,35 +199,6 @@ export default class SortFilterTable extends Table {
 				reset: this.onResetFiltersPressed.bind(this),
 				filterItems: filterItems
 			}));
-	}
-
-	private createFilterControl(column: SortFilterColumn): Control {
-		return column.getFilterItem() as Control;
-	}
-
-	/*private createSelectFilterControl(column: SortFilterColumn): SimpleForm {
-		const filter = column.getFilter() as SortFilterColumnFilterSelect;
-
-		return new SimpleForm({
-			content: [
-				new Label({ text: "Filter Operator" }),
-				new MultiComboBox({
-					items: {
-						path: `{${filter.getMasterdataItemsBinding()}}`,
-						template: new Item({
-							key: `{${filter.getMasterdataKey()}}`,
-							text: `{${filter.getMasterdataText()}}`
-						})
-					},
-					selectedKeys: `{${this.getId()}>/${column.getId()}/selectedKeys}`,
-					selectionFinish: this.onSelectFilterOperatorSelectionFinished.bind(this),
-				}),
-			]
-		});
-	} */
-
-	private onSelectFilterOperatorSelectionFinished(event: MultiComboBox$SelectionFinishEvent): void {
-		throw new Error("Method not implemented.");
 	}
 
 	private onConfirmFiltersPressed(event: ViewSettingsDialog$ConfirmEvent): void {
