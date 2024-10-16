@@ -107,67 +107,6 @@
                     </ColumnListItem>
                 </cc:items>
             </cc:SortFilterTable>
-
-            <Table items="{
-                path: 'data>/drivers',
-                sorter: {
-                    path: 'name'
-                }
-            }"
-                autoPopinMode="true"
-                id="table">
-                <headerToolbar>
-                    <OverflowToolbar>
-                        <Title text="Formula 1 Drivers"
-                            level="H2" />
-                        <ToolbarSpacer />
-                        <Button press="onOpenSortDialogPressed"
-                            icon="sap-icon://sort"
-                            tooltip="Sort" />
-                        <Button press="onOpenFilterDialogPressed"
-                            icon="sap-icon://filter"
-                            tooltip="Filter" />
-                    </OverflowToolbar>
-                </headerToolbar>
-                <columns>
-                    <Column>
-                        <Text text="Driver Name" />
-                    </Column>
-                    <Column>
-                        <Text text="Nationality" />
-                    </Column>
-                    <Column>
-                        <Text text="Number" />
-                    </Column>
-                    <Column>
-                        <Text text="Birthday" />
-                    </Column>
-                    <Column>
-                        <Text text="Team" />
-                    </Column>
-                </columns>
-                <items>
-                    <ColumnListItem vAlign="Middle"
-                        type="Navigation">
-                        <cells>
-                            <Text text="{data>name}" />
-                            <Text text="{data>nationality}" />
-                            <Text text="{data>number}" />
-                            <Text text="{
-                                path: 'data>birthday',
-                                type: 'sap.ui.model.type.Date',
-                                formatOptions: {
-                                    pattern: 'dd.MM.yyyy',
-                                    source: {
-                                        pattern: 'dd.MM.yyyy' 
-                                    }
-                                }
-                            }" />
-                            <Text text="{data>team}" />
-                        </cells>
-                    </ColumnListItem>
-                </items>
-            </Table>
         </content>
     </Page>
 </mvc:View>
