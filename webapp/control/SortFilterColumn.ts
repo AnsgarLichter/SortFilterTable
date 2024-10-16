@@ -10,6 +10,7 @@ import FilterOperator from "sap/ui/model/FilterOperator";
 import { InputBase$ChangeEvent } from "sap/m/InputBase";
 import SortFilterTable from "./SortFilterTable";
 import JSONModel from "sap/ui/model/json/JSONModel";
+import Filter from "sap/ui/model/Filter";
 
 /**
  * @namespace com.lichter.mobilesortfilter.control
@@ -40,7 +41,7 @@ export default class SortFilterColumn extends Column {
         };
     }
 
-    public getFilterItem(): Control {
+    public getFilterForm(): Control {
         const table = this.getParent() as SortFilterTable;
 
         return new SimpleForm({
@@ -65,6 +66,23 @@ export default class SortFilterColumn extends Column {
 				})
 			]
 		});
+    }
+
+    public getFilterItem(): Filter {
+        const id = this.getId();
+        const tableId = this.getParent()!.getId();
+        const tableSettingsModel = this.getModel(tableId) as JSONModel;
+
+        const filterOperator = tableSettingsModel.getProperty(`/${id}/filterOperator`) as FilterOperator;
+        const filterValue = tableSettingsModel.getProperty(`/${id}/filterValue`) as string;
+        const comparator = this.getSortComparator() as ((p1: any, p2: any) => number);
+
+        return new Filter({
+            path: this.getTargetProperty(),
+            operator: filterOperator,
+            value1: filterValue,
+            comparator: comparator
+        });
     }
 
     private onStringFilterValueChanged(event: InputBase$ChangeEvent): void {

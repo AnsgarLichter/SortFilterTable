@@ -8,6 +8,8 @@ import SortFilterTable from "./SortFilterTable";
 import Control from "sap/ui/core/Control";
 import MultiComboBox, { MultiComboBox$SelectionFinishEvent } from "sap/m/MultiComboBox";
 import JSONModel from "sap/ui/model/json/JSONModel";
+import Filter from "sap/ui/model/Filter";
+import FilterOperator from "sap/ui/model/FilterOperator";
 
 /**
  * @namespace com.lichter.mobilesortfilter.control
@@ -31,7 +33,7 @@ export default class SortFilterColumnNumber extends SortFilterColumn {
         };
     }
 
-	public getFilterItem(): Control {
+	public getFilterForm(): Control {
         const table = this.getParent() as SortFilterTable;
 
         return new SimpleForm({
@@ -50,6 +52,30 @@ export default class SortFilterColumnNumber extends SortFilterColumn {
 				}),
 			]
 		});
+    }
+
+	public getFilterItem(): Filter {
+        const id = this.getId();
+        const tableId = this.getParent()!.getId();
+        const tableSettingsModel = this.getModel(tableId) as JSONModel;
+
+        const filterValues = tableSettingsModel.getProperty(`/${id}/selectedKeys`) as string[];
+        const comparator = this.getSortComparator() as ((p1: any, p2: any) => number);
+        
+		const OrFilters: Filter[] = [];
+		filterValues.forEach((filterValue: string) => {
+			OrFilters.push(new Filter({	
+				path: this.getTargetProperty(),
+				operator: FilterOperator.EQ,
+				value1: filterValue,
+				comparator: comparator
+			}));
+		});
+
+        return new Filter({
+            filters: OrFilters,
+			and: false
+        });
     }
 
     private onItemsSelectionFinished(event: MultiComboBox$SelectionFinishEvent): void {

@@ -145,6 +145,9 @@ export default class Overview extends Controller {
                 },
                 {
                     name: "Canada"
+                },
+                {
+                    name: "Monaco"
                 }
             ]
         });

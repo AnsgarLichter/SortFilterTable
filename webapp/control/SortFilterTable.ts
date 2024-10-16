@@ -18,6 +18,7 @@ import Log from "sap/base/Log";
 import SortFilterColumnDate from "./SortFilterColumnDate";
 import SortFilterColumnNumber from "./SortFilterColumnNumber";
 import SortFilterColumnSelect from "./SortFilterColumnSelect";
+import Filter from "sap/ui/model/Filter";
 
 /**
  * @namespace com.lichter.mobilesortfilter.control
@@ -73,12 +74,9 @@ export default class SortFilterTable extends Table {
 		}
 
 		const data: { [key: string]: object } = {};
-		//TODO: Create model based on type of filter aggregation of column
-
 		this.getColumns().forEach((column) => {
 			data[column.getId()] = column.getDefaultFilterSettings();
 		});
-
 		this.setModel(new JSONModel(data), this.getId());
 	}
 
@@ -188,7 +186,7 @@ export default class SortFilterTable extends Table {
 				text: header.getText(),
 				filterCount: `{${this.getId()}>/${column.getId()}/filterCount}`,
 				selected: `{${this.getId()}>/${column.getId()}/isSelected}`,
-				customControl: column.getFilterItem()
+				customControl: column.getFilterForm()
 			});
 		});
 
@@ -202,13 +200,32 @@ export default class SortFilterTable extends Table {
 	}
 
 	private onConfirmFiltersPressed(event: ViewSettingsDialog$ConfirmEvent): void {
-		//TODO: Implement
-		throw new Error("Method not implemented.");
+		const filterItems = event.getParameter("filterItems");
+		if (!filterItems) {
+			return;
+		}
+
+		const columns = this.getColumns();
+		const filters: Filter[] = [];
+
+		filterItems.forEach((filterItem) => {
+			const filterKey = filterItem.getKey();
+			const column = columns.find((column) => column.getId() === filterKey);			
+			if (!column) {
+				const message = `Column with ID ${filterKey} to apply filter to not found`;
+				Log.error(message);
+				throw new Error(message);
+			}
+
+			filters.push(column.getFilterItem());
+		});
+
+		const itemsBinding = this.getBinding("items") as ListBinding;
+		itemsBinding.filter(filters);
 	}
 
 	private onResetFiltersPressed(): void {
-		//TODO: Implement
-		throw new Error("Method not implemented.");
+		this.initializeModel();
 	}
 
 	private getSortDialog(): ViewSettingsDialog {

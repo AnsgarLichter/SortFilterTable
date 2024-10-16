@@ -10,6 +10,7 @@ import SimpleForm from "sap/ui/layout/form/SimpleForm";
 import SortFilterTable from "./SortFilterTable";
 import Control from "sap/ui/core/Control";
 import JSONModel from "sap/ui/model/json/JSONModel";
+import Filter from "sap/ui/model/Filter";
 
 /**
  * @namespace com.lichter.mobilesortfilter.control
@@ -31,7 +32,7 @@ export default class SortFilterColumnDate extends SortFilterColumn {
         };
     }
 
-	public getFilterItem(): Control {
+	public getFilterForm(): Control {
         const table = this.getParent() as SortFilterTable;
 
         return new SimpleForm({
@@ -62,11 +63,11 @@ export default class SortFilterColumnDate extends SortFilterColumn {
 				}),
 
 				new Label({
-					visible: `{= \${${this.getId()}>/${this.getId()}/filterOperator} === '${FilterOperator.BT}'}`,
+					visible: `{= \${${table.getId()}>/${this.getId()}/filterOperator} === '${FilterOperator.BT}'}`,
 					text: "End Date"
 				}),
 				new DatePicker({
-					visible: `{= \${${this.getId()}>/${this.getId()}/filterOperator} === '${FilterOperator.BT}'}`,
+					visible: `{= \${${table.getId()}>/${this.getId()}/filterOperator} === '${FilterOperator.BT}'}`,
 					value: {
 						path: `${table.getId()}>/${this.getId()}/filterValue2`,
 						type: this.getPropertyBindingType(),
@@ -76,6 +77,25 @@ export default class SortFilterColumnDate extends SortFilterColumn {
 				})
 			]
 		});
+    }
+
+	public getFilterItem(): Filter {
+        const id = this.getId();
+        const tableId = this.getParent()!.getId();
+        const tableSettingsModel = this.getModel(tableId) as JSONModel;
+
+        const filterOperator = tableSettingsModel.getProperty(`/${id}/filterOperator`) as FilterOperator;
+        const filterValue = tableSettingsModel.getProperty(`/${id}/filterValue`) as string;
+        const filterValue2 = tableSettingsModel.getProperty(`/${id}/filterValue2`) as string;
+        const comparator = this.getSortComparator() as ((p1: any, p2: any) => number);
+        
+        return new Filter({
+            path: this.getTargetProperty(),
+            operator: filterOperator,
+            value1: filterValue,
+			value2: filterValue2,
+            comparator: comparator
+        });
     }
 
     private onDateFilterOperatorChanged(event: Select$ChangeEvent): void {
