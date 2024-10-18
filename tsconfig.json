@@ -18,7 +18,8 @@
         "webapp/*"
       ]
     },
-    "types": [ "@sapui5/ts-types-esm" ]
+    // TODO: THIS IS IT - transformDependencies is set to true if a dep has a "ui5.yaml" file
+    "types": [ "@sapui5/ts-types-esm", "com.lichter.lib" ]
   },
   "include": [
     "webapp/**/*"

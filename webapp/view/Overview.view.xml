@@ -1,11 +1,11 @@
 <mvc:View 
     controllerName="com.lichter.mobilesortfilter.controller.Overview"
     xmlns="sap.m"
-    xmlns:cc="com.lichter.mobilesortfilter.control"
+    xmlns:cc="com.lichter.lib"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:core="sap.ui.core"
     core:require="{
-        comparator: 'com/lichter/mobilesortfilter/utils/Comparator'
+        comparator: 'com/lichter/lib/utils/Comparator'
     }"
     displayBlock="true">
 

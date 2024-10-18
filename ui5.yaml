@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://sap.github.io/ui5-tooling/schema/ui5.yaml.json
 
-specVersion: "2.5"
+specVersion: "3.0"
 metadata:
   name: com.lichter.mobilesortfilter
 type: application
@@ -29,12 +29,16 @@ server:
         transpileTypeScript: true
         excludePatterns:
           - /Component-preload.js
+        transpileDependencies: true
     - name: fiori-tools-preview
       afterMiddleware: fiori-tools-appreload
       configuration:
         component: com.lichter.mobilesortfilter
         ui5Theme: sap_fiori_3_dark
 builder:
+  settings:
+    includeDependency:
+      - com.lichter.lib
   customTasks:
     - name: ui5-tooling-transpile-task
       afterTask: replaceVersion
@@ -43,3 +47,4 @@ builder:
         removeConsoleStatements: true
         transpileAsync: true
         transpileTypeScript: true
+        transpileDependencies: true

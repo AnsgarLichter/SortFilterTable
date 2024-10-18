@@ -44,5 +44,10 @@
       "ui5-tooling-transpile"
     ]
   },
-  "sapuxLayer": "CUSTOMER_BASE"
+  "sapuxLayer": "CUSTOMER_BASE",
+  "dependencies": {
+    "com.lichter.lib": "file:../com.lichter.lib",
+    "ui5-middleware-servestatic": "^3.2.0",
+    "ui5-tooling-modules": "^3.16.3"
+  }
 }
