@@ -11,14 +11,14 @@ import Sorter from "sap/ui/model/Sorter";
 import ListBinding from "sap/ui/model/ListBinding";
 import SortFilterColumn from "./SortFilterColumn";
 import Element from "sap/ui/core/Element";
-import Column from "sap/m/Column";
 import ViewSettingsCustomItem from "sap/m/ViewSettingsCustomItem";
 import JSONModel from "sap/ui/model/json/JSONModel";
 import Log from "sap/base/Log";
-import SortFilterColumnDate from "./SortFilterColumnDate";
-import SortFilterColumnNumber from "./SortFilterColumnNumber";
-import SortFilterColumnSelect from "./SortFilterColumnSelect";
 import Filter from "sap/ui/model/Filter";
+import Toolbar from "sap/m/Toolbar";
+
+// TODO: Refactor coding - remove obsolete imports, reduce code duplication, write meaningful comments where necessary
+// TODO: i18n
 
 /**
  * @namespace com.lichter.mobilesortfilter.control
@@ -58,14 +58,16 @@ export default class SortFilterTable extends Table {
 	private initialRenderingDone = false;
 
 	onBeforeRendering(): void {
-		if (!this.initialRenderingDone) {
-			this.initializeModel();
-			this.initializeToolbar();
-			this.initializeSortDialog();
-			this.initializeFilterDialog();
-
-			this.initialRenderingDone = true;
+		if (this.initialRenderingDone) {
+			return;
 		}
+
+		this.initializeModel();
+		this.initializeToolbar();
+		this.initializeSortDialog();
+		this.initializeFilterDialog();
+
+		this.initialRenderingDone = true;
 	}
 
 	private initializeModel() {
@@ -87,13 +89,7 @@ export default class SortFilterTable extends Table {
 			return;
 		}
 
-		headerToolbar.addContent(new ToolbarSpacer());
-		if (this.getCreateSortDialog()) {
-			headerToolbar.addContent(this.createSortButton());
-		}
-		if (this.getCreateFilterDialog()) {
-			headerToolbar.addContent(this.createFilterButton());
-		}
+		this.addHeaderContent(headerToolbar);
 	}
 
 	private createToolbar(): OverflowToolbar {
@@ -105,16 +101,23 @@ export default class SortFilterTable extends Table {
 			}));
 		}
 
-		headerToolbar.addContent(new ToolbarSpacer());
-		headerToolbar.addContent(this.createSortButton());
-		headerToolbar.addContent(this.createFilterButton());
-
+		this.addHeaderContent(headerToolbar);
 		return headerToolbar;
+	}
+
+	private addHeaderContent(headerToolbar: Toolbar) {
+		headerToolbar.addContent(new ToolbarSpacer());
+		if (this.getCreateSortDialog()) {
+			headerToolbar.addContent(this.createSortButton());
+		}
+		if (this.getCreateFilterDialog()) {
+			headerToolbar.addContent(this.createFilterButton());
+		}
 	}
 
 	private createSortButton(): Button {
 		return new Button({
-			icon: "sap-icon://sort",
+			icon: "{i18n>lichter.mobilesortfilter.sort.icon}",
 			press: this.onOpenSortDialogPressed.bind(this)
 		});
 	}
@@ -125,7 +128,7 @@ export default class SortFilterTable extends Table {
 
 	private createFilterButton(): Button {
 		return new Button({
-			icon: "sap-icon://filter",
+			icon: "{i18n>lichter.mobilesortfilter.filter.icon}",
 			press: this.onOpenFilterDialogPressed.bind(this)
 		});
 	}
@@ -139,9 +142,20 @@ export default class SortFilterTable extends Table {
 			return;
 		}
 
+		this.setSortDialog(this.createSortDialog());
+	}
+
+	private createSortDialog() {
+		const sortDialog = new ViewSettingsDialog({
+			confirm: this.onConfirmSortPressed.bind(this),
+			sortItems: this.createSortItems()
+		});
+		return sortDialog;
+	}
+
+	private createSortItems() {
 		const columns = this.getColumns();
 		const sortItems = columns.map((column) => {
-			// TODO: What if it is not a text header?
 			const header = column.getHeader() as Text;
 			return new ViewSettingsItem({
 				key: column.getId(),
@@ -149,11 +163,7 @@ export default class SortFilterTable extends Table {
 			});
 		});
 
-		const sortDialog = new ViewSettingsDialog({
-			confirm: this.onConfirmSortPressed.bind(this),
-			sortItems: sortItems
-		});
-		this.setAggregation("_sortDialog", sortDialog);
+		return sortItems;
 	}
 
 	private onConfirmSortPressed(event: ViewSettingsDialog$ConfirmEvent): void {
@@ -161,16 +171,19 @@ export default class SortFilterTable extends Table {
 		const sortDescending = event.getParameter("sortDescending");
 		const sortItem = event.getParameter("sortItem");
 		if (!itemsBinding || !sortItem) {
+			Log.warning("No items binding or sort item found. Sorting cannot be applied!");
 			return;
 		}
 
 		const column = Element.getElementById(sortItem.getKey()) as SortFilterColumn;
-		itemsBinding.sort(new Sorter(
-			column.getTargetProperty(),
-			sortDescending,
-			false,
-			column.getSortComparator()
-		));
+		itemsBinding.sort(
+			new Sorter(
+				column.getTargetProperty(),
+				sortDescending,
+				false,
+				column.getSortComparator()
+			)
+		);
 	}
 
 	private initializeFilterDialog() {
@@ -190,27 +203,39 @@ export default class SortFilterTable extends Table {
 			});
 		});
 
-		this.setAggregation(
-			"_filterDialog",
+		this.setFilterDialog(
 			new ViewSettingsDialog({
 				confirm: this.onConfirmFiltersPressed.bind(this),
 				reset: this.onResetFiltersPressed.bind(this),
 				filterItems: filterItems
-			}));
+			})
+		);
 	}
 
 	private onConfirmFiltersPressed(event: ViewSettingsDialog$ConfirmEvent): void {
 		const filterItems = event.getParameter("filterItems");
 		if (!filterItems) {
+			Log.warning("No filter items found. No filters will be applied!");
 			return;
 		}
 
+		this.applyFilters(filterItems);
+	}
+
+	private applyFilters(filterItems: ViewSettingsItem[]) {
 		const columns = this.getColumns();
 		const filters: Filter[] = [];
 
+		this.buildFiltersFromItems(filterItems, columns, filters);
+
+		const itemsBinding = this.getBinding("items") as ListBinding;
+		itemsBinding.filter(filters);
+	}
+
+	private buildFiltersFromItems(filterItems: ViewSettingsItem[], columns: SortFilterColumn[], filters: Filter[]) {
 		filterItems.forEach((filterItem) => {
 			const filterKey = filterItem.getKey();
-			const column = columns.find((column) => column.getId() === filterKey);			
+			const column = columns.find((column) => column.getId() === filterKey);
 			if (!column) {
 				const message = `Column with ID ${filterKey} to apply filter to not found`;
 				Log.error(message);
@@ -219,9 +244,6 @@ export default class SortFilterTable extends Table {
 
 			filters.push(column.getFilterItem());
 		});
-
-		const itemsBinding = this.getBinding("items") as ListBinding;
-		itemsBinding.filter(filters);
 	}
 
 	private onResetFiltersPressed(): void {
@@ -234,5 +256,13 @@ export default class SortFilterTable extends Table {
 
 	private getFilterDialog(): ViewSettingsDialog {
 		return this.getAggregation("_filterDialog") as ViewSettingsDialog;
+	}
+
+	private setSortDialog(sortDialog: ViewSettingsDialog): void {
+		this.setAggregation("_sortDialog", sortDialog);
+	}
+
+	private setFilterDialog(filterDialog: ViewSettingsDialog): void {
+		this.setAggregation("_filterDialog", filterDialog);
 	}
 }

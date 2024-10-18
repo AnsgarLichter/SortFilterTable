@@ -20,7 +20,7 @@ export default class SortFilterColumn extends Column {
     constructor(idOrSettings?: string | $SortFilterColumnSettings);
     constructor(id?: string, settings?: $SortFilterColumnSettings);
     constructor(id?: string, settings?: $SortFilterColumnSettings) { super(id, settings); }
-    //TODO: How to define this as interface? If possible, transform this to SortFilterColumnString
+
     static readonly metadata: MetadataOptions = {
         properties: {
             "targetProperty": { type: "string", defaultValue: "" },
@@ -46,11 +46,11 @@ export default class SortFilterColumn extends Column {
 
         return new SimpleForm({
 			content: [
-				new Label({ text: "Filter Operator" }),
+				new Label({ text: "{i18n>lichter.mobilesortfilter.filter.item.operator.label}" }),
 				new Select({
 					items: [
-						new Item({ key: FilterOperator.EQ, text: "Equals" }),
-						new Item({ key: FilterOperator.Contains, text: "Contains" }),
+						new Item({ key: FilterOperator.EQ, text: "{i18n>lichter.mobilesortfilter.filter.operator.equals}" }),
+						new Item({ key: FilterOperator.Contains, text: "{i18n>lichter.mobilesortfilter.filter.operator.contains}" }),
 					],
 					selectedKey: `{${table.getId()}>/${this.getId()}/filterOperator}`,
 				}),
@@ -70,8 +70,7 @@ export default class SortFilterColumn extends Column {
 
     public getFilterItem(): Filter {
         const id = this.getId();
-        const tableId = this.getParent()!.getId();
-        const tableSettingsModel = this.getModel(tableId) as JSONModel;
+        const tableSettingsModel = this.getTableSettingsModel();
 
         const filterOperator = tableSettingsModel.getProperty(`/${id}/filterOperator`) as FilterOperator;
         const filterValue = tableSettingsModel.getProperty(`/${id}/filterValue`) as string;
@@ -85,10 +84,16 @@ export default class SortFilterColumn extends Column {
         });
     }
 
-    private onStringFilterValueChanged(event: InputBase$ChangeEvent): void {
-        const id = this.getId();
+    protected getTableSettingsModel() {
         const tableId = this.getParent()!.getId();
         const tableSettingsModel = this.getModel(tableId) as JSONModel;
+
+        return tableSettingsModel;
+    }
+
+    private onStringFilterValueChanged(event: InputBase$ChangeEvent): void {
+        const id = this.getId();
+        const tableSettingsModel = this.getTableSettingsModel();
 
         const value = tableSettingsModel.getProperty(`/${id}/filterValue`) as string;
         const isSelected = value !== null && value !== "";

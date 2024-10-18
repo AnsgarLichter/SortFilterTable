@@ -1,26 +1,32 @@
-import { InputBase$ChangeEvent } from "sap/m/InputBase";
 import Label from "sap/m/Label";
-import Select, { Select$ChangeEvent } from "sap/m/Select";
+import Select from "sap/m/Select";
 import { MetadataOptions } from "sap/ui/base/ManagedObject";
 import Item from "sap/ui/core/Item";
 import FilterOperator from "sap/ui/model/FilterOperator";
 import SortFilterColumn from "./SortFilterColumn";
 import SimpleForm from "sap/ui/layout/form/SimpleForm";
-import SortFilterTable from "./SortFilterTable";
 import Control from "sap/ui/core/Control";
 import Input from "sap/m/Input";
-import JSONModel from "sap/ui/model/json/JSONModel";
 import Filter from "sap/ui/model/Filter";
+import FilterItem from "../utils/filterItem";
 
 /**
  * @namespace com.lichter.mobilesortfilter.control
  */
 export default class SortFilterColumnNumber extends SortFilterColumn {
 
+    private filterItemHelper: FilterItem;
+
     static readonly metadata: MetadataOptions = {
         properties: {},
         aggregations: {}
     };
+
+    init(): void {
+        super.init();
+
+        this.filterItemHelper = new FilterItem(this.getId());
+    }
 
     public getDefaultFilterSettings(): object {
         return {
@@ -37,22 +43,22 @@ export default class SortFilterColumnNumber extends SortFilterColumn {
 
         return new SimpleForm({
             content: [
-                new Label({ text: "Filter Operator" }),
+                new Label({ text: "{i18n>lichter.mobilesortfilter.filter.item.operator.label}" }),
                 new Select({
                     items: [
-                        new Item({ key: FilterOperator.BT, text: "Between" }),
-                        new Item({ key: FilterOperator.EQ, text: "Equals" }),
-                        new Item({ key: FilterOperator.GT, text: "Greater Than" }),
-                        new Item({ key: FilterOperator.GE, text: "Greater or Equals" }),
-                        new Item({ key: FilterOperator.LE, text: "Less or Equals" }),
-                        new Item({ key: FilterOperator.LT, text: "Less than" }),
-                        new Item({ key: FilterOperator.NE, text: "Not Equals" }),
+                        new Item({ key: FilterOperator.BT, text: "{i18n>lichter.mobilesortfilter.filter.operator.bt}" }),
+                        new Item({ key: FilterOperator.EQ, text: "{i18n>lichter.mobilesortfilter.filter.operator.equals}" }),
+                        new Item({ key: FilterOperator.GT, text: "{i18n>lichter.mobilesortfilter.filter.operator.gt}" }),
+                        new Item({ key: FilterOperator.GE, text: "{i18n>lichter.mobilesortfilter.filter.operator.ge}" }),
+                        new Item({ key: FilterOperator.LE, text: "{i18n>lichter.mobilesortfilter.filter.operator.le}" }),
+                        new Item({ key: FilterOperator.LT, text: "{i18n>lichter.mobilesortfilter.filter.operator.lt}" }),
+                        new Item({ key: FilterOperator.NE, text: "{i18n>lichter.mobilesortfilter.filter.operator.ne}" }),
                     ],
                     change: this.onNumberFilterOperatorChanged.bind(this),
                     selectedKey: `{${parentId}>/${this.getId()}/filterOperator}`
                 }),
 
-                new Label({ text: "Value 1" }),
+                new Label({ text: "{i18n>lichter.mobilesortfilter.filter.item.number.value1.label}" }),
                 new Input({
                     type: 'Number',
                     value: {
@@ -65,7 +71,7 @@ export default class SortFilterColumnNumber extends SortFilterColumn {
 
                 new Label({
                     visible: `{= \${${parentId}>/${this.getId()}/filterOperator} === '${FilterOperator.BT}'}`,
-                    text: "Value 2"
+                    text: "{i18n>lichter.mobilesortfilter.filter.item.number.value2.label}"
                 }),
                 new Input({
                     visible: `{= \${${parentId}>/${this.getId()}/filterOperator} === '${FilterOperator.BT}'}`,
@@ -83,14 +89,13 @@ export default class SortFilterColumnNumber extends SortFilterColumn {
 
     public getFilterItem(): Filter {
         const id = this.getId();
-        const tableId = this.getParent()!.getId();
-        const tableSettingsModel = this.getModel(tableId) as JSONModel;
+        const tableSettingsModel = this.getTableSettingsModel();
 
         const filterOperator = tableSettingsModel.getProperty(`/${id}/filterOperator`) as FilterOperator;
         const filterValue = tableSettingsModel.getProperty(`/${id}/filterValue`) as string;
         const filterValue2 = tableSettingsModel.getProperty(`/${id}/filterValue2`) as string;
         const comparator = this.getSortComparator() as ((p1: any, p2: any) => number);
-        
+
         return new Filter({
             path: this.getTargetProperty(),
             operator: filterOperator,
@@ -101,40 +106,13 @@ export default class SortFilterColumnNumber extends SortFilterColumn {
     }
 
     private onNumberFilterOperatorChanged(): void {
-        this.clearFilterValue2();
-        this.updateFilterStatus(); 
+        this.filterItemHelper.clearFilterValue2();
+        this.filterItemHelper.updateFilterStatus();
     }
 
-    private onNumberFilterValueChanged(event: InputBase$ChangeEvent): void {
-        this.updateFilterStatus();
+    private onNumberFilterValueChanged(): void {
+        this.filterItemHelper.updateFilterStatus();
     }
 
-    private clearFilterValue2() {
-        const id = this.getId();
-        const parentId = this.getParent()!.getId();
-        const tableSettingsModel = this.getModel(parentId) as JSONModel;
 
-        const filterOperator = tableSettingsModel.getProperty(`/${id}/filterOperator`) as string;
-        if (filterOperator !== FilterOperator.BT) {
-            tableSettingsModel.setProperty(`/${id}/filterValue2`, "");
-        }
-    }
-
-    private updateFilterStatus() {
-        const id = this.getId();
-        const parentId = this.getParent()!.getId();
-        const tableSettingsModel = this.getModel(parentId) as JSONModel;
-
-        const filterOperator = tableSettingsModel.getProperty(`/${id}/filterOperator`) as string;
-        const value1 = tableSettingsModel.getProperty(`/${id}/filterValue`) as string;
-        const value2 = tableSettingsModel.getProperty(`/${id}/filterValue2`) as string;
-
-        let isSelected = value1 !== null && value1 !== "";
-        if (filterOperator === FilterOperator.BT) {
-            isSelected = isSelected && value2 !== null && value2 !== "";
-        }
-
-        tableSettingsModel.setProperty(`/${id}/isSelected`, isSelected);
-        tableSettingsModel.setProperty(`/${id}/filterCount`, isSelected ? 1 : 0);
-    }
 }

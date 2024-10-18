@@ -1,20 +1,17 @@
-import { InputBase$ChangeEvent } from "sap/m/InputBase";
 import Label from "sap/m/Label";
 import { MetadataOptions } from "sap/ui/base/ManagedObject";
 import Item from "sap/ui/core/Item";
 import SortFilterColumn from "./SortFilterColumn";
 import SimpleForm from "sap/ui/layout/form/SimpleForm";
-import SortFilterTable from "./SortFilterTable";
 import Control from "sap/ui/core/Control";
 import MultiComboBox, { MultiComboBox$SelectionFinishEvent } from "sap/m/MultiComboBox";
-import JSONModel from "sap/ui/model/json/JSONModel";
 import Filter from "sap/ui/model/Filter";
 import FilterOperator from "sap/ui/model/FilterOperator";
 
 /**
  * @namespace com.lichter.mobilesortfilter.control
  */
-export default class SortFilterColumnNumber extends SortFilterColumn {
+export default class SortFilterColumnSelect extends SortFilterColumn {
  
 	static readonly metadata: MetadataOptions = {
 		properties: {
@@ -34,11 +31,9 @@ export default class SortFilterColumnNumber extends SortFilterColumn {
     }
 
 	public getFilterForm(): Control {
-        const table = this.getParent() as SortFilterTable;
-
         return new SimpleForm({
 			content: [
-				new Label({ text: "Filter Items" }),
+				new Label({ text: "{i18n>lichter.mobilesortfilter.filter.item.select.items.label}" }),
 				new MultiComboBox({
 					items: {
 						path: `${this.getMasterdataItemsBinding()}`,
@@ -56,8 +51,7 @@ export default class SortFilterColumnNumber extends SortFilterColumn {
 
 	public getFilterItem(): Filter {
         const id = this.getId();
-        const tableId = this.getParent()!.getId();
-        const tableSettingsModel = this.getModel(tableId) as JSONModel;
+        const tableSettingsModel = this.getTableSettingsModel();
 
         const filterValues = tableSettingsModel.getProperty(`/${id}/selectedKeys`) as string[];
         const comparator = this.getSortComparator() as ((p1: any, p2: any) => number);
@@ -98,10 +92,5 @@ export default class SortFilterColumnNumber extends SortFilterColumn {
 
 		tableSettingsModel.setProperty(`/${this.getId()}/isSelected`, isSelected);
 		tableSettingsModel.setProperty(`/${this.getId()}/filterCount`, isSelected ? 1 : 0);
-	}
-
-	private getTableSettingsModel() {
-		const parentId = this.getParent()!.getId();
-		return this.getModel(parentId) as JSONModel;
 	}
 }
