@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<library xmlns="http://www.sap.com/sap.ui.library.xsd">
+	<name>com.lichter.lib</name>
+	<vendor>Ansgar Lichter</vendor>
+	<version>${version}</version>
+	<copyright>${copyright}</copyright>
+	<title>com.lichter.lib</title>
+	<documentation>Some description about com.lichter.lib</documentation>
+	<dependencies>
+		<dependency>
+			<libraryName>sap.ui.core</libraryName>
+		</dependency>
+	</dependencies>
+</library>
