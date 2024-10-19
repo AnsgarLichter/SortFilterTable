@@ -29,7 +29,6 @@ server:
         transpileTypeScript: true
         excludePatterns:
           - /Component-preload.js
-        transpileDependencies: true
     - name: fiori-tools-preview
       afterMiddleware: fiori-tools-appreload
       configuration:
@@ -47,4 +46,3 @@ builder:
         removeConsoleStatements: true
         transpileAsync: true
         transpileTypeScript: true
-        transpileDependencies: true
