@@ -1,27 +1,21 @@
 {
-  "compilerOptions": {
-    "target": "es2015",
-    "module": "es2015",
-    "skipLibCheck": true,
-    "preserveConstEnums": true,
-    "inlineSourceMap": true,
-    "allowJs": true,
-    "strict": true,
-    "strictNullChecks": true,
-    "strictPropertyInitialization": false,
-    "moduleResolution": "node",
-    "rootDir": "webapp",
-    "outDir": "./dist",
-    "baseUrl": "./",
-    "paths": {
-      "com/lichter/mobilesortfilter/*": [
-        "webapp/*"
-      ]
-    },
-    // TODO: THIS IS IT - transformDependencies is set to true if a dep has a "ui5.yaml" file
-    "types": [ "@sapui5/ts-types-esm", "com.lichter.lib" ]
-  },
-  "include": [
-    "webapp/**/*"
-  ]
+	"compilerOptions": {
+		"target": "es2023",
+		"module": "es2022",
+		"moduleResolution": "node",
+		"skipLibCheck": true,
+		"allowJs": true,
+		"strict": true,
+		"strictNullChecks": false,
+		"strictPropertyInitialization": false,
+		"rootDir": "./webapp",
+		"types": ["@sapui5/types", "@types/qunit", "com.lichter.lib"],
+		"paths": {
+			"com/lichter/mobilesortfilter/*": ["./webapp/*"],
+			"unit/*": ["./webapp/test/unit/*"],
+			"integration/*": ["./webapp/test/integration/*"]
+		}
+	},
+	"exclude": ["./webapp/test/e2e/**/*"],
+	"include": ["./webapp/**/*"]
 }

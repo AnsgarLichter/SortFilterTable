@@ -1,11 +1,11 @@
-import Controller from "sap/ui/core/mvc/Controller";
+import BaseController from "./BaseController";
 
 /**
  * @namespace com.lichter.mobilesortfilter.controller
  */
-export default class App extends Controller {
-
-    public onInit(): void {
-
-    }
+export default class App extends BaseController {
+	public onInit(): void {
+		// apply content density mode to root view
+		this.getView().addStyleClass(this.getOwnerComponent().getContentDensityClass());
+	}
 }

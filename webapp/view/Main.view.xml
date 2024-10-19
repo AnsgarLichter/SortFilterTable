@@ -1,15 +1,15 @@
-<mvc:View 
-    controllerName="com.lichter.mobilesortfilter.controller.Overview"
-    xmlns="sap.m"
-    xmlns:cc="com.lichter.lib"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns:core="sap.ui.core"
-    core:require="{
+<mvc:View
+	controllerName="com.lichter.mobilesortfilter.controller.Main"
+	displayBlock="true"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:core="sap.ui.core"
+	xmlns:cc="com.lichter.lib"
+	core:require="{
         comparator: 'com/lichter/lib/utils/Comparator'
-    }"
-    displayBlock="true">
+    }">
 
-    <Page id="page"
+	<Page id="page"
         title="{i18n>title}">
         <content>
 
@@ -109,4 +109,5 @@
             </cc:SortFilterTable>
         </content>
     </Page>
+
 </mvc:View>

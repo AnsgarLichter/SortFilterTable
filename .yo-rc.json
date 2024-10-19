@@ -1,0 +1,19 @@
+{
+  "generator-ui5-ts-app": {
+    "namespace": "com.lichter.mobilesortfilter",
+    "framework": "SAPUI5",
+    "frameworkVersion": "1.129.2",
+    "author": "Ansgar Lichter",
+    "initrepo": false,
+    "tstypes": "@sapui5/types",
+    "tstypesVersion": "1.129.2",
+    "appId": "com.lichter.mobilesortfilter",
+    "appURI": "com/lichter/mobilesortfilter",
+    "cdnDomain": "ui5.sap.com",
+    "defaultTheme": "sap_horizon",
+    "gte1_98_0": true,
+    "gte1_104_0": true,
+    "gte1_115_0": true,
+    "setupCompleted": true
+  }
+}

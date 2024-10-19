@@ -1,12 +1,12 @@
+import BaseController from "./BaseController";
 import JSONModel from "sap/ui/model/json/JSONModel";
-import Controller from "sap/ui/core/mvc/Controller";
 
 /**
  * @namespace com.lichter.mobilesortfilter.controller
  */
-export default class Overview extends Controller {
-
-    public onInit(): void {
+export default class Main extends BaseController {
+	
+	public onInit(): void {
         const dataModel = new JSONModel({
             drivers: [
                 {
