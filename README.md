@@ -65,7 +65,7 @@ Somehow the library is only recognized and served correctly, if both are linked 
 }
 ```
 
-### Transpiling dependencies
+### Transpile dependencies
 
 To transpile a dependency, e. g. a UI5 TypeScript library, the library must be added to the `types` of the `tsconfig.json` (see [fix(ui5-tooling-transpile): derive transpileDependencies from tsconfig](https://github.com/ui5-community/ui5-ecosystem-showcase/pull/786/files)):
 
@@ -81,7 +81,8 @@ If the other requirements are met, the library will be transpiled and be able to
 
 ### Library's translations
 
-The libraries texts in the `messagebundle.properties` do not get served when the FIORI launchpad sandbox is used. If you know how to fix this, please let me know.
+The libraries texts in the `messagebundle.properties` do not get served when the [SAP Fiori Tools](https://www.npmjs.com/package/@sap/ux-ui5-tooling) are used, all other files of the library do work. 
+If you know how to fix this, please let me know.
 
 ## Future enhancements
 
