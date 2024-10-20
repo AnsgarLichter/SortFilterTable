@@ -43,6 +43,20 @@ new Label({ text: resourceBundle.getText("lichter.mobilesortfilter.filter.item.o
 ```
 
 This enhancement of the application's `i18n` model is also a good possibility to reuse standard translations from SAPUI5's default libraries like `sap/ui/core`. This way you don't have to maintain the same `Confirm` text in every application.
+Alternatively you can enhance the `i18n` model with the texts of all libraries which are registered in the `manifest.json` via the following function:
+
+```ts
+private async enhanceResourceModel() {
+    const resourceModel = this.getModel("i18n") as ResourceModel;
+    const libs = this.getManifestEntry("/sap.ui5/dependencies/libs") as object;
+    for(const lib in libs) {
+        const bundleName = `${lib}.messagebundle`;
+        await resourceModel.enhance({
+            bundleName: bundleName
+        });
+    }
+}
+```
 
 ### UI5 Workspaces
 

@@ -14,6 +14,7 @@
         <content>
 
             <Title text="{i18n>lichter.mobilesortfilter.filter.item.select.items.label}" />
+            <Title text="{i18n>ACC_CTR_TYPE_BUTTON}" />
 
             <cc:SortFilterTable 
                 title="Formula 1 Drivers"

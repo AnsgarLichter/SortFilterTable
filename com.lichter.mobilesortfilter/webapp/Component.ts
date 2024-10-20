@@ -1,11 +1,11 @@
-import UIComponent from "sap/ui/core/UIComponent";
+import ComLichterLibComponent from "com/lichter/lib/Component";
 import models from "./model/models";
 import Device from "sap/ui/Device";
 
 /**
  * @namespace com.lichter.mobilesortfilter
  */
-export default class Component extends UIComponent {
+export default class Component extends ComLichterLibComponent {
 	public static metadata = {
 		manifest: "json",
 	};
@@ -13,13 +13,9 @@ export default class Component extends UIComponent {
 	private contentDensityClass: string;
 
 	public init(): void {
-		// call the base component's init function
 		super.init();
 
-		// create the device model
 		this.setModel(models.createDeviceModel(), "device");
-
-		// create the views based on the url/hash
 		this.getRouter().initialize();
 	}
 
