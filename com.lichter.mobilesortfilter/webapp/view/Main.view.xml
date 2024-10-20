@@ -22,19 +22,6 @@
                     }
                 }"
                 autoPopinMode="true">
-                <!-- <cc:headerToolbar>
-                    <OverflowToolbar>
-                        <Title text="Formula 1 Drivers"
-                            level="H2" />
-                        <ToolbarSpacer />
-                        <Button press="onOpenSortDialogPressed"
-                            icon="sap-icon://sort"
-                            tooltip="Sort" />
-                        <Button press="onOpenFilterDialogPressed"
-                            icon="sap-icon://filter"
-                            tooltip="Filter" />
-                    </OverflowToolbar>
-                </cc:headerToolbar> -->
                 <cc:columns>
                     <cc:SortFilterColumn 
                         targetProperty="name"
