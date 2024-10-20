@@ -7,6 +7,43 @@ If you have any issues or feedback, please let me know.
 
 ## Remarks
 
+## Binding texts via i18n in library
+
+To be able to bind texts in the library via the `i18n` model, the `manifest.json` of the application must be adapted as follows:
+
+```json
+"models": {
+    "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+            "bundleName": "com.lichter.mobilesortfilter.i18n.i18n",
+            "enhanceWith": [
+                {
+                    "bundleName": "com.lichter.lib.messagebundle",
+                    "supportedLocales": [""],
+                    "fallbackLocale": ""
+                }
+            ]
+        }
+    }
+}
+```
+
+Please maintain the `supportedLocales` and `fallbackLocale` as specified in the library's `manifest.json`. With this enhancement, texts inside the library can be bound via the `i18n` model:
+
+```ts
+new Label({ text: "{i18n>lichter.mobilesortfilter.filter.item.operator.label}" }),
+```
+
+If this is not a possibility, the texts must be set via `sap/ui/core/Lib.getResourceBundleForLib`:
+
+```ts
+const resourceModel = Lib.getResourceBundleFor("com.lichter.lib");
+new Label({ text: resourceBundle.getText("lichter.mobilesortfilter.filter.item.operator.label") }),
+```
+
+This enhancement of the application's `i18n` model is also a good possibility to reuse standard translations from SAPUI5's default libraries like `sap/ui/core`. This way you don't have to maintain the same `Confirm` text in every application.
+
 ### UI5 Workspaces
 
 To my current understanding of UI5 workspaces, the `ui5-workspace.yaml` should be sufficient to use the library:
@@ -28,7 +65,7 @@ Somehow the library is only recognized and served correctly, if both are linked 
 }
 ```
 
-### Transpiling Dependencies
+### Transpiling dependencies
 
 To transpile a dependency, e. g. a UI5 TypeScript library, the library must be added to the `types` of the `tsconfig.json` (see [fix(ui5-tooling-transpile): derive transpileDependencies from tsconfig](https://github.com/ui5-community/ui5-ecosystem-showcase/pull/786/files)):
 
@@ -46,7 +83,7 @@ If the other requirements are met, the library will be transpiled and be able to
 
 The libraries texts in the `messagebundle.properties` do not get served when the FIORI launchpad sandbox is used. If you know how to fix this, please let me know.
 
-## Future Enhancements
+## Future enhancements
 
 - [ ] Sample page included in the library
 - [ ] Unit tests for the custom controls

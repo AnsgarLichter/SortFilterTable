@@ -13,6 +13,8 @@
         title="{i18n>title}">
         <content>
 
+            <Title text="{i18n>lichter.mobilesortfilter.filter.item.select.items.label}" />
+
             <cc:SortFilterTable 
                 title="Formula 1 Drivers"
                 items="{
